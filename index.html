@@ -1,0 +1,1855 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ধাঁধা স্টুডিও - অ্যাডমিন কন্ট্রোলড টাইমার সংস্করণ</title>
+  <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;500;600;700&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Hind Siliguri', 'Poppins', sans-serif; }
+    body { background-color: #f1f5f9; color: #1e293b; min-height: 100vh; display: flex; flex-direction: column; }
+    
+    header {
+      background: #111827;
+      padding: 14px 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border-bottom: 1px solid #1f2937;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+    .brand { display: flex; align-items: center; gap: 10px; font-size: 1.2rem; font-weight: 700; color: #38bdf8; }
+    .brand i { font-size: 1.4rem; color: #f59e0b; }
+
+    .container { flex: 1; max-width: 1200px; width: 100%; margin: 0 auto; padding: 20px 12px; display: flex; flex-direction: column; justify-content: center; align-items: center; }
+    .tab-pane { display: none; width: 100%; }
+    .tab-pane.active { display: flex; flex-direction: column; align-items: center; width: 100%; }
+
+    /* প্রফেশনাল ও স্টাইলিশ অ্যাডমিন প্যানেল লেআউট */
+    .admin-wrapper { display: flex; width: 100%; min-height: 88vh; background: #f8fafc; border-radius: 20px; overflow: hidden; color: #1e293b; box-shadow: 0 10px 30px rgba(0,0,0,0.08); border: 1px solid #e2e8f0; }
+    .admin-sidebar { width: 280px; background: #0f172a; color: #fff; display: flex; flex-direction: column; border-right: 1px solid #1e293b; }
+    .admin-sidebar-brand { padding: 22px; font-size: 1.3rem; font-weight: 700; background: #090d16; border-bottom: 1px solid #1e293b; display: flex; align-items: center; gap: 10px; color: #38bdf8; }
+    .admin-menu { list-style: none; padding: 18px 12px; display: flex; flex-direction: column; gap: 8px; }
+    .admin-menu-item { padding: 14px 18px; border-radius: 10px; color: #94a3b8; font-size: 1rem; font-weight: 600; cursor: pointer; display: flex; align-items: center; gap: 12px; transition: all 0.2s; }
+    .admin-menu-item.active, .admin-menu-item:hover { background: #059669; color: #fff; box-shadow: 0 4px 12px rgba(5, 150, 105, 0.3); }
+
+    .admin-main-content { flex: 1; display: flex; flex-direction: column; background: #f8fafc; }
+    .admin-top-bar { height: 70px; background: #ffffff; border-bottom: 1px solid #cbd5e1; display: flex; align-items: center; justify-content: space-between; padding: 0 30px; box-shadow: 0 2px 4px rgba(0,0,0,0.02); }
+    .admin-top-title { font-size: 1.25rem; font-weight: 700; color: #0f172a; display: flex; align-items: center; gap: 10px; border-left: 5px solid #059669; padding-left: 12px; }
+    .admin-body-area { padding: 30px; overflow-y: auto; max-height: calc(88vh - 70px); width: 100%; }
+
+    .admin-section { display: none; }
+    .admin-section.active { display: block; }
+
+    .admin-grid { display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 25px; width: 100%; }
+    @media (max-width: 900px) { 
+      .admin-wrapper { flex-direction: column; }
+      .admin-sidebar { width: 100%; }
+      .admin-grid { grid-template-columns: 1fr; } 
+    }
+
+    .card { 
+      background: #ffffff; 
+      border-radius: 16px; 
+      border: 1px solid #cbd5e1; 
+      padding: 25px; 
+      box-shadow: 0 6px 15px -3px rgba(0,0,0,0.06); 
+      margin-bottom: 25px; 
+      width: 100%; 
+      color: #1e293b; 
+      resize: both; 
+      overflow: auto; 
+      min-width: 300px;
+    }
+    .card-title { font-size: 1.2rem; font-weight: 700; color: #0f172a; margin-bottom: 18px; display: flex; align-items: center; gap: 10px; border-bottom: 2px solid #f1f5f9; padding-bottom: 10px; }
+    .card-title i { color: #059669; font-size: 1.3rem; }
+
+    .form-group { margin-bottom: 18px; }
+    label { display: block; margin-bottom: 7px; font-size: 0.95rem; font-weight: 600; color: #334155; }
+    .input-text, .input-select { width: 100%; background: #f8fafc; border: 1.5px solid #cbd5e1; color: #0f172a; padding: 12px 16px; border-radius: 10px; font-size: 1rem; outline: none; transition: border-color 0.2s; }
+    .input-text:focus, .input-select:focus { border-color: #059669; background: #fff; }
+
+    .file-upload-box { border: 2px dashed #94a3b8; border-radius: 12px; padding: 18px; text-align: center; cursor: pointer; background: #f8fafc; transition: all 0.2s; position: relative; }
+    .file-upload-box:hover { border-color: #059669; background: #f0fdf4; }
+    .file-upload-box input[type="file"] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
+    .file-upload-box i { font-size: 1.8rem; color: #64748b; margin-bottom: 6px; }
+    .file-upload-box span { display: block; font-size: 0.85rem; color: #64748b; font-weight: 500; }
+
+    .preview-thumbnail { max-width: 100%; max-height: 120px; border-radius: 8px; margin-top: 8px; display: none; object-fit: contain; border: 1px solid #cbd5e1; }
+    .audio-indicator { margin-top: 8px; font-size: 0.85rem; color: #16a34a; display: none; align-items: center; gap: 6px; font-weight: 600; }
+
+    .submit-btn {
+      width: 100%;
+      background: linear-gradient(135deg, #059669, #10b981);
+      color: white;
+      border: none;
+      padding: 13px;
+      border-radius: 10px;
+      font-size: 1.05rem;
+      font-weight: 700;
+      cursor: pointer;
+      margin-top: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      box-shadow: 0 4px 12px rgba(5, 150, 105, 0.3);
+      transition: filter 0.2s;
+    }
+    .submit-btn:hover { filter: brightness(1.08); }
+
+    .riddle-list-container { max-height: 450px; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; padding-right: 5px; }
+    .riddle-item { background: #f8fafc; border: 1px solid #cbd5e1; border-radius: 10px; padding: 12px; display: flex; gap: 12px; align-items: center; justify-content: space-between; transition: background 0.2s; }
+    .riddle-item:hover { background: #f1f5f9; }
+    .riddle-item-info { flex: 1; overflow: hidden; }
+    .riddle-item-title { font-size: 0.95rem; font-weight: 700; color: #0f172a; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .riddle-item-sub { font-size: 0.8rem; color: #64748b; margin-top: 2px; }
+    .riddle-item-thumbs { display: flex; gap: 6px; }
+    .riddle-item-thumbs img { width: 40px; height: 40px; object-fit: cover; border-radius: 6px; border: 1px solid #cbd5e1; }
+
+    .action-btns { display: flex; gap: 6px; align-items: center; }
+    .move-btn { background: #e2e8f0; color: #475569; border: none; padding: 6px 8px; cursor: pointer; font-size: 0.9rem; border-radius: 6px; transition: background 0.2s; }
+    .move-btn:hover { background: #cbd5e1; color: #0f172a; }
+    .edit-btn { background: #e0f2fe; color: #0284c7; border: none; padding: 6px 10px; cursor: pointer; font-size: 0.9rem; border-radius: 6px; transition: background 0.2s; }
+    .edit-btn:hover { background: #bae6fd; }
+    .group-edit-btn { background: #fef3c7; color: #d97706; border: none; padding: 6px 10px; cursor: pointer; font-size: 0.9rem; border-radius: 6px; transition: background 0.2s; }
+    .group-edit-btn:hover { background: #fde68a; }
+    .delete-btn { background: #fee2e2; color: #ef4444; border: none; padding: 6px 10px; cursor: pointer; font-size: 0.9rem; border-radius: 6px; transition: background 0.2s; }
+    .delete-btn:hover { background: #fecaca; }
+
+    .group-manage-list { display: flex; flex-direction: column; gap: 10px; max-height: 250px; overflow-y: auto; margin-top: 15px; }
+    .group-tag-item { background: #f8fafc; border: 1px solid #cbd5e1; padding: 10px 14px; border-radius: 10px; display: flex; justify-content: space-between; align-items: center; font-size: 0.95rem; gap: 12px; }
+    .group-tag-img { width: 45px; height: 45px; border-radius: 8px; object-fit: cover; border: 1px solid #cbd5e1; }
+
+    .floating-admin-btn {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      width: 45px;
+      height: 45px;
+      background: #111827;
+      border: 1.5px solid #38bdf8;
+      border-radius: 50%;
+      color: #38bdf8;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+      z-index: 999;
+      transition: all 0.2s;
+    }
+    .floating-admin-btn:hover { background: #38bdf8; color: #030712; transform: scale(1.1); }
+
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(3, 7, 18, 0.85);
+      backdrop-filter: blur(5px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      padding: 15px;
+    }
+    .modal-content {
+      background: #111827;
+      border: 1px solid #1f2937;
+      border-radius: 18px;
+      width: 100%;
+      max-width: 580px;
+      max-height: 90vh;
+      overflow-y: auto;
+      padding: 28px;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+      color: #fff;
+    }
+
+    /* ইউজার প্যানেল: পারফেক্ট সেন্টার্ড ও অ্যানিমেটেড স্কয়ার কার্ড ডিজাইন */
+    .groups-grid { 
+      display: grid; 
+      grid-template-columns: repeat(3, 1fr); 
+      gap: 22px; 
+      width: 100%;
+      max-width: 900px;
+      margin: 0 auto;
+      justify-content: center;
+    }
+    @media (max-width: 850px) {
+      .groups-grid { grid-template-columns: repeat(1, 1fr); max-width: 350px; }
+    }
+
+    .group-card { 
+      background: #111827; 
+      border: 1.5px solid #1f2937; 
+      border-radius: 18px; 
+      aspect-ratio: 1 / 1;
+      padding: 18px; 
+      text-align: center; 
+      box-shadow: 0 10px 25px rgba(0,0,0,0.4); 
+      display: flex; 
+      flex-direction: column; 
+      justify-content: space-between;
+      align-items: center; 
+      transition: all 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+    .group-card:hover { 
+      border-color: #38bdf8; 
+      transform: translateY(-8px) scale(1.02); 
+      box-shadow: 0 20px 35px rgba(56, 189, 248, 0.25); 
+    }
+    
+    .group-card-top { display: flex; flex-direction: column; align-items: center; gap: 4px; width: 100%; }
+    .group-card-img { width: 55px; height: 55px; border-radius: 50%; object-fit: cover; border: 2.5px solid #38bdf8; box-shadow: 0 4px 10px rgba(56, 189, 248, 0.3); transition: transform 0.3s; }
+    .group-card:hover .group-card-img { transform: scale(1.08); }
+    .group-card h3 { font-size: 1.1rem; color: #38bdf8; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; }
+    .group-card p { font-size: 0.78rem; color: #9ca3af; }
+    .group-card-note { font-size: 0.75rem; color: #34d399; font-style: italic; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; width: 100%; background: rgba(5, 150, 105, 0.15); padding: 2px 6px; border-radius: 4px; margin-top: 2px; }
+    
+    .group-card-bottom { display: flex; flex-direction: column; gap: 6px; width: 100%; }
+    .pin-input { width: 100%; background: #1f2937; border: 1.5px solid #374151; color: #f8fafc; padding: 8px; border-radius: 8px; text-align: center; font-size: 0.95rem; letter-spacing: 4px; outline: none; }
+    .pin-input:focus { border-color: #38bdf8; }
+    .group-enter-btn { width: 100%; background: linear-gradient(135deg, #0284c7, #0ea5e9); color: white; border: none; padding: 8px; border-radius: 8px; font-size: 0.85rem; font-weight: 700; cursor: pointer; transition: filter 0.2s; }
+    .group-enter-btn:hover { filter: brightness(1.1); }
+
+    .game-lobby-box {
+      background: #111827;
+      border: 1.5px solid #1f2937;
+      border-radius: 24px;
+      padding: 40px 30px;
+      text-align: center;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.6);
+      max-width: 460px;
+      margin: 40px auto;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      animation: fadeInScale 0.4s ease;
+    }
+    @keyframes fadeInScale {
+      from { opacity: 0; transform: scale(0.9); }
+      to { opacity: 1; transform: scale(1); }
+    }
+    .game-lobby-box img {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      object-fit: cover;
+      margin: 0 auto;
+      border: 3px solid #38bdf8;
+      box-shadow: 0 8px 20px rgba(56, 189, 248, 0.4);
+    }
+    .bpm-start-btn {
+      width: 100%;
+      background: linear-gradient(135deg, #059669, #10b981);
+      color: white;
+      border: none;
+      padding: 16px;
+      border-radius: 14px;
+      font-size: 1.2rem;
+      font-weight: 800;
+      cursor: pointer;
+      box-shadow: 0 6px 20px rgba(5, 150, 105, 0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      transition: all 0.2s;
+    }
+    .bpm-start-btn:hover { transform: translateY(-2px); filter: brightness(1.1); box-shadow: 0 8px 25px rgba(5, 150, 105, 0.6); }
+
+    .bpm-back-btn {
+      width: 100%;
+      background: #1f2937;
+      color: #cbd5e1;
+      border: 1.5px solid #374151;
+      padding: 13px;
+      border-radius: 12px;
+      font-size: 1rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      transition: all 0.2s;
+    }
+    .bpm-back-btn:hover { background: #374151; color: #fff; }
+
+    /* ==================== 9:16 রিলস গেম ভিউপোর্ট ==================== */
+    .game-viewport {
+      width: 100%;
+      max-width: 405px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+    
+    .single-screen-card {
+      background: #000000;
+      border-radius: 16px;
+      overflow: hidden;
+      border: 2px solid #1f2937;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.7);
+      position: relative;
+      aspect-ratio: 9 / 16;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .status-bar {
+      padding: 10px 16px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      transition: background 0.4s;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+      z-index: 10;
+    }
+    .status-bar.question-mode { background: #0284c7; color: white; }
+    .status-bar.answer-mode { background: #16a34a; color: white; }
+
+    .nav-icon-btn {
+      background: rgba(0, 0, 0, 0.25);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      color: white;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      transition: background 0.2s;
+    }
+    .nav-icon-btn:hover { background: rgba(0, 0, 0, 0.5); }
+
+    .riddle-badge-box {
+      background: rgba(15, 23, 42, 0.85);
+      border: 1.5px solid #fbbf24;
+      color: #fef08a;
+      padding: 2px 10px;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      font-weight: 800;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.3);
+      font-family: 'Poppins', sans-serif;
+    }
+
+    .stage-box {
+      position: relative;
+      width: 100%;
+      flex: 1;
+      background: #000000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+    }
+
+    .stage-image {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
+    .anim-fade { opacity: 1; transform: scale(1); transition: opacity 0.4s ease, transform 0.4s ease; }
+    .anim-fade.out { opacity: 0; transform: scale(1.06); }
+
+    .anim-slide-right { transform: translateX(0); opacity: 1; transition: transform 0.4s ease, opacity 0.4s ease; }
+    .anim-slide-right.out { transform: translateX(100%); opacity: 0; }
+
+    .anim-slide-left { transform: translateX(0); opacity: 1; transition: transform 0.4s ease, opacity 0.4s ease; }
+    .anim-slide-left.out { transform: translateX(-100%); opacity: 0; }
+
+    .anim-slide-bottom { transform: translateY(0); opacity: 1; transition: transform 0.4s ease, opacity 0.4s ease; }
+    .anim-slide-bottom.out { transform: translateY(100%); opacity: 0; }
+
+    .anim-zoom-bounce { transform: scale(1); opacity: 1; transition: transform 0.45s cubic-bezier(0.175, 0.885, 0.32, 1.275), opacity 0.4s ease; }
+    .anim-zoom-bounce.out { transform: scale(0); opacity: 0; }
+
+    .anim-spin { transform: rotate(0deg) scale(1); opacity: 1; transition: transform 0.5s ease, opacity 0.4s ease; }
+    .anim-spin.out { transform: rotate(180deg) scale(0.2); opacity: 0; }
+
+    .anim-blur { filter: blur(0px); opacity: 1; transition: filter 0.4s ease, opacity 0.4s ease; }
+    .anim-blur.out { filter: blur(20px); opacity: 0; }
+
+    .anim-flip { transform: rotateY(0deg); opacity: 1; transition: transform 0.5s ease, opacity 0.5s ease; backface-visibility: hidden; }
+    .anim-flip.out { transform: rotateY(90deg); opacity: 0; }
+
+    .anim-off { transition: none !important; }
+
+    .clock-widget {
+      position: absolute;
+      top: 10px;
+      right: 12px;
+      width: 64px;
+      height: 64px;
+      border-radius: 50%;
+      background: rgba(15, 23, 42, 0.85);
+      backdrop-filter: blur(12px);
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.6), inset 0 0 10px rgba(245, 158, 11, 0.35);
+      border: 2px solid #fbbf24;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 25;
+      animation: clockGlow 1.2s infinite alternate;
+    }
+
+    @keyframes clockGlow {
+      0% { box-shadow: 0 0 10px rgba(245, 158, 11, 0.4); transform: scale(1); }
+      100% { box-shadow: 0 0 20px rgba(245, 158, 11, 0.9); transform: scale(1.04); }
+    }
+
+    .clock-svg {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      transform: rotate(-90deg);
+    }
+
+    .clock-svg circle { fill: none; stroke-width: 3.5; stroke-linecap: round; }
+    .circle-track { stroke: rgba(55, 65, 81, 0.5); }
+    .circle-progress {
+      stroke: #f59e0b;
+      stroke-dasharray: 182;
+      stroke-dashoffset: 0;
+      transition: stroke-dashoffset 0.95s linear;
+    }
+
+    .clock-center { position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+    .clock-num { font-size: 1.35rem; font-weight: 800; color: #fef08a; line-height: 1; font-family: 'Poppins', sans-serif; text-shadow: 0 2px 4px rgba(0,0,0,0.6); }
+    .clock-label { font-size: 0.48rem; color: #94a3b8; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; }
+
+    .next-step-btn {
+      background: linear-gradient(135deg, #4f46e5, #6366f1);
+      color: white;
+      border: none;
+      width: 100%;
+      padding: 12px;
+      font-size: 1rem;
+      font-weight: 700;
+      border-radius: 12px;
+      cursor: pointer;
+      box-shadow: 0 6px 18px rgba(99, 102, 241, 0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .empty-state { text-align: center; padding: 30px 15px; color: #6b7280; }
+    .empty-state i { font-size: 2.5rem; margin-bottom: 10px; }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="brand">
+      <i class="fa-solid fa-puzzle-piece"></i>
+      <span>ধাঁধা স্টুডিও</span>
+    </div>
+  </header>
+
+  <div class="container">
+    <!-- লাইভ গেম / ইউজার প্যানেল -->
+    <div id="gameTab" class="tab-pane active" style="min-height: 85vh;">
+      <div class="game-viewport" id="gameView"></div>
+    </div>
+
+    <!-- প্রফেশনাল অ্যাডমিন প্যানেল -->
+    <div id="adminTab" class="tab-pane">
+      <div class="admin-wrapper">
+        <div class="admin-sidebar">
+          <div class="admin-sidebar-brand">
+            <i class="fa-solid fa-shield-halved"></i> Admin Pro
+          </div>
+          <ul class="admin-menu">
+            <li class="admin-menu-item active" id="menu-group" onclick="switchAdminSection('group')"><i class="fa-solid fa-layer-group"></i> নতুন প্রশ্ন গ্রুপ ও পিন</li>
+            <li class="admin-menu-item" id="menu-password" onclick="switchAdminSection('password')"><i class="fa-solid fa-key"></i> পাসওয়ার্ড পরিবর্তন</li>
+            <li class="admin-menu-item" id="menu-riddle" onclick="switchAdminSection('riddle')"><i class="fa-solid fa-file-audio"></i> ধাঁধা ও অ্যানিমেশন কনফিগ</li>
+            <li class="admin-menu-item" id="menu-reset" onclick="switchAdminSection('reset')"><i class="fa-solid fa-shuffle"></i> রিসেট ও র্যান্ডমাইজ</li>
+            <li class="admin-menu-item" onclick="closeAdminPanel()"><i class="fa-solid fa-arrow-left"></i> ইউজার প্যানেলে যান</li>
+          </ul>
+        </div>
+
+        <div class="admin-main-content">
+          <div class="admin-top-bar">
+            <div class="admin-top-title" id="adminSectionTitle">নতুন প্রশ্ন গ্রুপ ও পিন তৈরি করুন</div>
+            <button class="submit-btn" style="width: auto; padding: 8px 16px; margin-top: 0; background: #ef4444;" onclick="closeAdminPanel()">বেড়িয়ে যান</button>
+          </div>
+
+          <div class="admin-body-area">
+            <!-- সেকশন ১: গ্রুপ, অপশনাল পিন, পজিশন ও নোট তৈরি -->
+            <div class="admin-section active" id="sec-group">
+              <div class="card">
+                <div class="card-title">
+                  <i class="fa-solid fa-layer-group"></i>
+                  <span>নতুন প্রশ্ন গ্রুপ ও পিন তৈরি করুন</span>
+                </div>
+                <form id="groupForm" onsubmit="handleCreateGroup(event)">
+                  <div style="display: flex; flex-direction: column; gap: 14px;">
+                    <div style="display: flex; gap: 14px;">
+                      <div class="form-group" style="flex: 1; margin-bottom: 0;">
+                        <input type="text" id="groupNameInput" class="input-text" placeholder="গ্রুপের নাম (যেমন: সেট ১)" required>
+                      </div>
+                      <div class="form-group" style="width: 140px; margin-bottom: 0;" title="খালি রাখলে পিন লাগবে না">
+                        <input type="text" id="groupPinInput" class="input-text" placeholder="পিন (অপশনাল)">
+                      </div>
+                      <div class="form-group" style="width: 120px; margin-bottom: 0;" title="বেশি ভ্যালু দিলে গ্রুপ উপরে শো করবে">
+                        <input type="number" id="groupPosInput" class="input-text" placeholder="পজিশন" value="0">
+                      </div>
+                    </div>
+
+                    <div class="form-group" style="margin-bottom: 0;">
+                      <input type="text" id="groupNoteInput" class="input-text" placeholder="গ্রুপ নোট (অপশনাল, যেমন: বিশেষ কুইজ সেট)">
+                    </div>
+                    
+                    <div class="form-group" style="margin-bottom: 0;">
+                      <label>🖼️ গ্রুপের পিকচার (Thumbnail) আপলোড করুন বা লিংক দিন *</label>
+                      <div class="file-upload-box">
+                        <input type="file" id="groupImgInput" accept="image/*" onchange="previewImg(this, 'groupPreview')">
+                        <i class="fa-solid fa-image"></i>
+                        <span>গ্রুপের ছবি সিলেক্ট করুন</span>
+                      </div>
+                      <input type="text" id="groupImgLinkInput" class="input-text" placeholder="অথবা Google Drive / সরাসরি ইমেজ লিংক দিন" style="margin-top: 8px;">
+                      <img id="groupPreview" class="preview-thumbnail" alt="গ্রুপ ছবি">
+                    </div>
+
+                    <button type="submit" class="submit-btn">গ্রুপ সেভ করুন</button>
+                  </div>
+                </form>
+                <div class="group-manage-list" id="groupManageList"></div>
+              </div>
+            </div>
+
+            <!-- সেকশন ২: পাসওয়ার্ড পরিবর্তন -->
+            <div class="admin-section" id="sec-password">
+              <div class="card">
+                <div class="card-title">
+                  <i class="fa-solid fa-key"></i>
+                  <span>অ্যাডমিন পাসওয়ার্ড পরিবর্তন করুন</span>
+                </div>
+                <form onsubmit="handleChangePassword(event)" style="display: flex; gap: 14px;">
+                  <input type="password" id="newAdminPassword" class="input-text" placeholder="নতুন পাসওয়ার্ড দিন" required style="flex: 1; margin-bottom: 0;">
+                  <button type="submit" class="submit-btn" style="width: 160px; margin-top: 0;">পরিবর্তন করুন</button>
+                </form>
+              </div>
+            </div>
+
+            <!-- সেকশন ৩: ধাঁধা, অ্যানিমেশন ও টাইমার সেকেন্ড কনফিগ -->
+            <div class="admin-section" id="sec-riddle">
+              <div class="admin-grid">
+                <div class="card">
+                  <div class="card-title">
+                    <i class="fa-solid fa-file-audio"></i>
+                    <span>ধাঁধা, অডিও ও অ্যানিমেশন কনফিগ</span>
+                  </div>
+
+                  <form id="riddleForm" onsubmit="handleUpload(event)">
+                    <div class="form-group">
+                      <label>📁 প্রশ্ন কোন গ্রুপে যুক্ত হবে? *</label>
+                      <select id="riddleGroupSelect" class="input-select" required>
+                        <option value="">গ্রুপ সিলেক্ট করুন</option>
+                      </select>
+                    </div>
+
+                    <div class="form-group">
+                      <label>ধাঁধার শিরোনাম</label>
+                      <input type="text" id="riddleTitle" class="input-text" placeholder="যেমন: ধাঁধা #১">
+                    </div>
+
+                    <div class="form-group">
+                      <label>⏱️ টাইমার সেকেন্ড (কাউন্টডাউন সময়) *</label>
+                      <input type="number" id="riddleTimerSec" class="input-text" placeholder="যেমন: ৩০" value="30" min="5" max="300" required>
+                    </div>
+
+                    <div class="form-group" style="display: flex; align-items: center; gap: 12px; background: #f1f5f9; padding: 12px; border-radius: 10px; border: 1px solid #cbd5e1;">
+                      <input type="checkbox" id="isNewRiddleCheck" style="width: 20px; height: 20px; accent-color: #059669; cursor: pointer;">
+                      <label for="isNewRiddleCheck" style="margin-bottom: 0; cursor: pointer; color: #059669; font-weight: 700;">✨ এটিকে "নিউ ধাঁধা / নিউ কুইজ" হিসেবে মার্ক করুন</label>
+                    </div>
+
+                    <div class="form-group">
+                      <label>✨ ট্রানজিশন অ্যানিমেশন স্টাইল</label>
+                      <select id="riddleAnim" class="input-select">
+                        <option value="anim-fade" selected>১. স্মুথ ফেড ও জুম (Fade & Zoom)</option>
+                        <option value="anim-zoom-bounce">২. জুম ও বাউন্স (Zoom & Bounce)</option>
+                        <option value="anim-slide-right">৩. ডান দিক থেকে স্লাইড (Slide Right)</option>
+                        <option value="anim-slide-left">৪. বাম দিক থেকে স্লাইড (Slide Left)</option>
+                        <option value="anim-slide-bottom">৫. নিচ থেকে স্লাইড (Slide Bottom)</option>
+                        <option value="anim-spin">৬. স্পিন ও রোটেট (Spin Rotate)</option>
+                        <option value="anim-blur">৭. ব্লার ডিজলভ (Blur Dissolve)</option>
+                        <option value="anim-flip">৮. থ্রিডি ফ্লিপ (3D Flip)</option>
+                        <option value="anim-off">৯. অ্যানিমেশন বন্ধ (Off)</option>
+                      </select>
+                    </div>
+
+                    <div class="form-group">
+                      <label>১. প্রশ্নের ফটো (9:16) আপলোড করুন বা লিংক দিন *</label>
+                      <div class="file-upload-box">
+                        <input type="file" id="qFileInput" accept="image/*" onchange="previewImg(this, 'qPreview')">
+                        <i class="fa-solid fa-image"></i>
+                        <span>প্রশ্নের ছবি দিন</span>
+                      </div>
+                      <input type="text" id="qFileLinkInput" class="input-text" placeholder="অথবা Google Drive / সরাসরি ইমেজ লিংক দিন" style="margin-top: 8px;">
+                      <img id="qPreview" class="preview-thumbnail" alt="প্রশ্ন">
+                    </div>
+
+                    <div class="form-group">
+                      <label>🎙️ প্রশ্নের ভয়েস অডিও ফাইল (MP3) আপলোড বা লিংক দিন *</label>
+                      <div class="file-upload-box">
+                        <input type="file" id="qAudioInput" accept="audio/*" onchange="indicateAudio(this, 'qAudioInfo')">
+                        <i class="fa-solid fa-microphone-lines"></i>
+                        <span>প্রশ্নের অডিও ফাইল দিন</span>
+                      </div>
+                      <input type="text" id="qAudioLinkInput" class="input-text" placeholder="অথবা Google Drive / সরাসরি অডিও লিংক দিন" style="margin-top: 8px;">
+                      <div class="audio-indicator" id="qAudioInfo"><i class="fa-solid fa-circle-check"></i> সিলেক্ট হয়েছে</div>
+                    </div>
+
+                    <hr style="border-color: #cbd5e1; margin: 18px 0;">
+
+                    <div class="form-group">
+                      <label>২. উত্তরের ফটো (9:16) আপলোড করুন বা লিংক দিন *</label>
+                      <div class="file-upload-box">
+                        <input type="file" id="aFileInput" accept="image/*" onchange="previewImg(this, 'aPreview')">
+                        <i class="fa-solid fa-circle-check"></i>
+                        <span>উত্তরের ছবি দিন</span>
+                      </div>
+                      <input type="text" id="aFileLinkInput" class="input-text" placeholder="অথবা Google Drive / সরাসরি ইমেজ লিংক দিন" style="margin-top: 8px;">
+                      <img id="aPreview" class="preview-thumbnail" alt="উত্তর">
+                    </div>
+
+                    <div class="form-group">
+                      <label>🎙️ উত্তরের ভয়েস অডিও ফাইল (MP3) আপলোড বা লিংক দিন *</label>
+                      <div class="file-upload-box">
+                        <input type="file" id="aAudioInput" accept="audio/*" onchange="indicateAudio(this, 'aAudioInfo')">
+                        <i class="fa-solid fa-volume-high"></i>
+                        <span>উত্তরের অডিও ফাইল দিন</span>
+                      </div>
+                      <input type="text" id="aAudioLinkInput" class="input-text" placeholder="অথবা Google Drive / সরাসরি অডিও লিংক দিন" style="margin-top: 8px;">
+                      <div class="audio-indicator" id="aAudioInfo"><i class="fa-solid fa-circle-check"></i> সিলেক্ট হয়েছে</div>
+                    </div>
+
+                    <button type="submit" id="saveBtn" class="submit-btn">
+                      <i class="fa-solid fa-plus"></i> ধাঁধা সেভ করুন
+                    </button>
+                  </form>
+                </div>
+
+                <div class="card">
+                  <div class="form-group" style="margin-bottom: 15px;">
+                    <label style="font-size: 0.85rem; color: #64748b;">গ্রুপ অনুযায়ী ফিল্টার করুন:</label>
+                    <select id="adminGroupFilter" class="input-select" onchange="renderAdminList()" style="padding: 8px 12px; font-size: 0.9rem;">
+                      <option value="all">সব গ্রুপ (সকল প্রশ্ন)</option>
+                    </select>
+                  </div>
+
+                  <div class="card-title">
+                    <i class="fa-solid fa-list-check"></i>
+                    <span>সংরক্ষিত ধাঁধাসমূহ (<span id="countBadge">০</span>)</span>
+                  </div>
+                  <div class="riddle-list-container" id="riddleList"></div>
+                </div>
+              </div>
+            </div>
+
+            <!-- সেকশন ৪: রিসেট ও র্যান্ডমাইজ -->
+            <div class="admin-section" id="sec-reset">
+              <div class="card" style="background: linear-gradient(135deg, #065f46, #047857); border-color: #059669; color: #fff;">
+                <div class="card-title" style="color: #fff;">
+                  <i class="fa-solid fa-shuffle" style="color: #34d399;"></i>
+                  <span>প্রশ্ন রিসেট ও র্যান্ডমাইজ সিস্টেম</span>
+                </div>
+                <p style="font-size: 0.95rem; color: #e2e8f0; margin-bottom: 15px;">আপনার হাজার হাজার প্রশ্নগুলো এলোমেলো করতে নিচের বাটনে ক্লিক করুন। এতে প্রতিবার গেমের প্রশ্ন উল্টোপাল্টা ক্রমানুসারে আসবে।</p>
+                <button type="button" class="submit-btn" style="background: #022c22;" onclick="resetAndRandomizeAllQuestions()">
+                  <i class="fa-solid fa-rotate"></i> রিসেট ও প্রশ্ন র্যান্ডমাইজ করুন
+                </button>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- একদম নিচে ডান কোণায় গোপন সেটিংস বাটন -->
+  <div class="floating-admin-btn" onclick="openAdminSecurityPrompt()" title="অ্যাডমিন প্যানেল">
+    <i class="fa-solid fa-gear" style="font-size: 1.2rem;"></i>
+  </div>
+
+  <!-- পপআপ এডিট মডাল (প্রশ্ন এডিট) -->
+  <div class="modal-overlay" id="editModal">
+    <div class="modal-content">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px;">
+        <h3 style="color: #38bdf8; font-size: 1.3rem;"><i class="fa-solid fa-pen-to-square"></i> ধাঁধা এডিট করুন</h3>
+        <button onclick="closeEditModal()" style="background: none; border: none; color: #9ca3af; font-size: 1.3rem; cursor: pointer;"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <form id="editRiddleForm" onsubmit="handleEditUpload(event)">
+        <input type="hidden" id="modalEditId">
+
+        <div class="form-group">
+          <label>📁 প্রশ্ন কোন গ্রুপে যুক্ত হবে? *</label>
+          <select id="modalGroupSelect" class="input-select" required></select>
+        </div>
+
+        <div class="form-group">
+          <label>ধাঁধার শিরোনাম</label>
+          <input type="text" id="modalTitle" class="input-text" required>
+        </div>
+
+        <div class="form-group">
+          <label>⏱️ টাইমার সেকেন্ড (কাউন্টডাউন সময়) *</label>
+          <input type="number" id="modalTimerSec" class="input-text" placeholder="যেমন: ৩০" value="30" min="5" max="300" required>
+        </div>
+
+        <div class="form-group" style="display: flex; align-items: center; gap: 10px; background: #1f2937; padding: 10px; border-radius: 8px; border: 1px solid #374151;">
+          <input type="checkbox" id="modalIsNewCheck" style="width: 18px; height: 18px; accent-color: #38bdf8; cursor: pointer;">
+          <label for="modalIsNewCheck" style="margin-bottom: 0; cursor: pointer; color: #38bdf8; font-weight: 700;">✨ এটিকে "নিউ ধাঁধা / নিউ কুইজ" হিসেবে মার্ক করুন</label>
+        </div>
+
+        <div class="form-group">
+          <label>✨ ট্রানজিশন অ্যানিমেশন স্টাইল</label>
+          <select id="modalAnim" class="input-select">
+            <option value="anim-fade">১. স্মুথ ফেড ও জুম (Fade & Zoom)</option>
+            <option value="anim-zoom-bounce">২. জুম ও বাউন্স (Zoom & Bounce)</option>
+            <option value="anim-slide-right">৩. ডান দিক থেকে স্লাইড (Slide Right)</option>
+            <option value="anim-slide-left">৪. বাম দিক থেকে স্লাইড (Slide Left)</option>
+            <option value="anim-slide-bottom">৫. নিচ থেকে স্লাইড (Slide Bottom)</option>
+            <option value="anim-spin">৬. স্পিন ও রোটেট (Spin Rotate)</option>
+            <option value="anim-blur">৭. ব্লার ডিজলভ (Blur Dissolve)</option>
+            <option value="anim-flip">৮. থ্রিডি ফ্লিপ (3D Flip)</option>
+            <option value="anim-off">৯. অ্যানিমেশন বন্ধ (Off)</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>১. প্রশ্নের ফটো (ফাইল বা লিংক)</label>
+          <div class="file-upload-box">
+            <input type="file" id="modalQFile" accept="image/*" onchange="previewImg(this, 'modalQPrev')">
+            <i class="fa-solid fa-image"></i>
+            <span>পরিবর্তন করতে ছবি দিন</span>
+          </div>
+          <input type="text" id="modalQLinkInput" class="input-text" placeholder="অথবা লিংক দিন" style="margin-top: 8px;">
+          <img id="modalQPrev" class="preview-thumbnail" alt="প্রশ্ন">
+        </div>
+
+        <div class="form-group">
+          <label>🎙️ প্রশ্নের অডিও (ফাইল বা লিংক)</label>
+          <div class="file-upload-box">
+            <input type="file" id="modalQAudio" accept="audio/*" onchange="indicateAudio(this, 'modalQAudioInfo')">
+            <i class="fa-solid fa-microphone-lines"></i>
+            <span>পরিবর্তন করতে অডিও দিন</span>
+          </div>
+          <input type="text" id="modalQAudioLinkInput" class="input-text" placeholder="অথবা লিংক দিন" style="margin-top: 8px;">
+          <div class="audio-indicator" id="modalQAudioInfo"><i class="fa-solid fa-circle-check"></i> সিলেক্ট হয়েছে</div>
+        </div>
+
+        <div class="form-group">
+          <label>২. উত্তরের ফটো (ফাইল বা লিংক)</label>
+          <div class="file-upload-box">
+            <input type="file" id="modalAFile" accept="image/*" onchange="previewImg(this, 'modalAPrev')">
+            <i class="fa-solid fa-circle-check"></i>
+            <span>পরিবর্তন করতে ছবি দিন</span>
+          </div>
+          <input type="text" id="modalALinkInput" class="input-text" placeholder="অথবা লিংক দিন" style="margin-top: 8px;">
+          <img id="modalAPrev" class="preview-thumbnail" alt="উত্তর">
+        </div>
+
+        <div class="form-group">
+          <label>🎙️ উত্তরের অডিও (ফাইল বা লিংক)</label>
+          <div class="file-upload-box">
+            <input type="file" id="modalAAudio" accept="audio/*" onchange="indicateAudio(this, 'modalAAudioInfo')">
+            <i class="fa-solid fa-volume-high"></i>
+            <span>পরিবর্তন করতে অডিও দিন</span>
+          </div>
+          <input type="text" id="modalAAudioLinkInput" class="input-text" placeholder="অথবা লিংক দিন" style="margin-top: 8px;">
+          <div class="audio-indicator" id="modalAAudioInfo"><i class="fa-solid fa-circle-check"></i> সিলেক্ট হয়েছে</div>
+        </div>
+
+        <button type="submit" class="submit-btn" style="background: linear-gradient(135deg, #10b981, #059669);">
+          <i class="fa-solid fa-floppy-disk"></i> পরিবর্তন সংরক্ষণ করুন
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- পপআপ গ্রুপ এডিট মডাল -->
+  <div class="modal-overlay" id="groupEditModal">
+    <div class="modal-content">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 18px;">
+        <h3 style="color: #38bdf8; font-size: 1.3rem;"><i class="fa-solid fa-layer-group"></i> গ্রুপ এডিট করুন</h3>
+        <button onclick="closeGroupEditModal()" style="background: none; border: none; color: #9ca3af; font-size: 1.3rem; cursor: pointer;"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+
+      <form id="editGroupForm" onsubmit="handleGroupEditUpload(event)">
+        <input type="hidden" id="modalGroupEditId">
+
+        <div class="form-group">
+          <label>গ্রুপের নাম</label>
+          <input type="text" id="modalGroupName" class="input-text" required>
+        </div>
+
+        <div class="form-group">
+          <label>পিন নম্বর (অপশনাল)</label>
+          <input type="text" id="modalGroupPin" class="input-text" placeholder="খালি রাখলে পিন লাগবে না">
+        </div>
+
+        <div class="form-group">
+          <label>পজিশন ভ্যালু (যত বেশি, তত উপরে শো করবে)</label>
+          <input type="number" id="modalGroupPos" class="input-text" value="0">
+        </div>
+
+        <div class="form-group">
+          <label>নোট (অপশনাল, যা ইউজার প্যানেলে শো করবে)</label>
+          <input type="text" id="modalGroupNote" class="input-text" placeholder="যেমন: নতুন আপডেট">
+        </div>
+
+        <div class="form-group">
+          <label>গ্রুপের থাম্বনেইল (ফাইল বা লিংক)</label>
+          <div class="file-upload-box">
+            <input type="file" id="modalGroupImgFile" accept="image/*" onchange="previewImg(this, 'modalGroupImgPrev')">
+            <i class="fa-solid fa-image"></i>
+            <span>পরিবর্তন করতে ছবি দিন</span>
+          </div>
+          <input type="text" id="modalGroupImgLinkInput" class="input-text" placeholder="অথবা লিংক দিন" style="margin-top: 8px;">
+          <img id="modalGroupImgPrev" class="preview-thumbnail" alt="গ্রুপ ছবি">
+        </div>
+
+        <button type="submit" class="submit-btn" style="background: linear-gradient(135deg, #10b981, #059669);">
+          <i class="fa-solid fa-floppy-disk"></i> গ্রুপ আপডেট করুন
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    let currentAudioPlayer = null;
+
+    function stopAllAudio() {
+      if (currentAudioPlayer) {
+        currentAudioPlayer.pause();
+        currentAudioPlayer.currentTime = 0;
+        currentAudioPlayer = null;
+      }
+    }
+
+    function playAudioSource(source, onFinish) {
+      stopAllAudio();
+      if (!source) { if (onFinish) onFinish(); return; }
+      
+      let url = source;
+      if (source instanceof Blob || source instanceof File) {
+        url = URL.createObjectURL(source);
+      }
+
+      const audio = new Audio(url);
+      currentAudioPlayer = audio;
+
+      audio.onended = () => { if (onFinish) onFinish(); };
+      audio.onerror = () => { if (onFinish) onFinish(); };
+      audio.play().catch(() => { if (onFinish) onFinish(); });
+    }
+
+    let audioCtx = null;
+    function initAudio() {
+      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+    }
+
+    function playTickSound() {
+      try {
+        initAudio();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'triangle';
+        osc.frequency.setValueAtTime(1400, audioCtx.currentTime);
+        osc.frequency.exponentialRampToValueAtTime(300, audioCtx.currentTime + 0.04);
+        gain.gain.setValueAtTime(0.35, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.04);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.04);
+      } catch (e) {}
+    }
+
+    function playTingSound() {
+      try {
+        initAudio();
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(1760, audioCtx.currentTime);
+        gain.gain.setValueAtTime(0.4, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + 0.3);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + 0.3);
+      } catch (e) {}
+    }
+
+    function playCelebrationSound() {
+      try {
+        initAudio();
+        const notes = [523.25, 659.25, 783.99, 1046.50];
+        notes.forEach((freq, idx) => {
+          const osc = audioCtx.createOscillator();
+          const gain = audioCtx.createGain();
+          osc.type = 'triangle';
+          osc.frequency.setValueAtTime(freq, audioCtx.currentTime + idx * 0.09);
+          gain.gain.setValueAtTime(0, audioCtx.currentTime);
+          gain.gain.setValueAtTime(0.35, audioCtx.currentTime + idx * 0.09);
+          gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + idx * 0.09 + 0.6);
+          osc.connect(gain);
+          gain.connect(audioCtx.destination);
+          osc.start(audioCtx.currentTime + idx * 0.09);
+          osc.stop(audioCtx.currentTime + idx * 0.09 + 0.6);
+        });
+      } catch (e) {}
+    }
+
+    function createDemoImage(text, subText, bgCol) {
+      const canvas = document.createElement('canvas');
+      canvas.width = 360;
+      canvas.height = 640;
+      const ctx = canvas.getContext('2d');
+
+      const grad = ctx.createLinearGradient(0, 0, 360, 640);
+      grad.addColorStop(0, bgCol);
+      grad.addColorStop(1, '#0f172a');
+      ctx.fillStyle = grad;
+      ctx.fillRect(0, 0, 360, 640);
+
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.07)';
+      ctx.fillRect(20, 20, 320, 600);
+
+      ctx.fillStyle = '#38bdf8';
+      ctx.font = 'bold 24px "Hind Siliguri", sans-serif';
+      ctx.textAlign = 'center';
+      ctx.fillText(text, 180, 280);
+
+      ctx.fillStyle = '#94a3b8';
+      ctx.font = '16px "Hind Siliguri", sans-serif';
+      ctx.fillText(subText, 180, 330);
+
+      return new Promise(resolve => canvas.toBlob(blob => resolve(blob), 'image/jpeg', 0.9));
+    }
+
+    function createDemoAudioBlob() {
+      try {
+        const sampleRate = 8000;
+        const duration = 1.0;
+        const numSamples = sampleRate * duration;
+        const buffer = new Float32Array(numSamples);
+        for (let i = 0; i < numSamples; i++) {
+          buffer[i] = Math.sin(2 * Math.PI * 440 * (i / sampleRate)) * 0.1;
+        }
+        const wavBuffer = createWavFile(buffer, sampleRate);
+        return new Blob([wavBuffer], { type: 'audio/wav' });
+      } catch (e) {
+        return new Blob([''], { type: 'audio/wav' });
+      }
+    }
+
+    function createWavFile(audioData, sampleRate) {
+      const numChannels = 1;
+      const bytesPerSample = 2;
+      const blockAlign = numChannels * bytesPerSample;
+      const byteRate = sampleRate * blockAlign;
+      const dataSize = audioData.length * bytesPerSample;
+      const chunkSize = 36 + dataSize;
+      
+      const buffer = new ArrayBuffer(8 + chunkSize);
+      const view = new DataView(buffer);
+      
+      function writeString(view, offset, string) {
+        for (let i = 0; i < string.length; i++) {
+          view.setUint8(offset + i, string.charCodeAt(i));
+        }
+      }
+      
+      writeString(view, 0, 'RIFF');
+      view.setUint32(4, chunkSize, true);
+      writeString(view, 8, 'WAVE');
+      writeString(view, 12, 'fmt ');
+      view.setUint32(16, 16, true);
+      view.setUint16(20, 1, true);
+      view.setUint16(22, numChannels, true);
+      view.setUint32(24, sampleRate, true);
+      view.setUint32(28, byteRate, true);
+      view.setUint16(32, blockAlign, true);
+      view.setUint16(34, 16, true);
+      writeString(view, 36, 'data');
+      view.setUint32(40, dataSize, true);
+      
+      let offset = 44;
+      for (let i = 0; i < audioData.length; i++, offset += 2) {
+        let s = Math.max(-1, Math.min(1, audioData[i]));
+        view.setInt16(offset, s < 0 ? s * 0x8000 : s * 0x7FFF, true);
+      }
+      return buffer;
+    }
+
+    const DB_NAME = 'RiddleTimerControlDB_v2';
+    const STORE_RIDDLES = 'riddles';
+    const STORE_GROUPS = 'groups';
+    let db = null;
+
+    function openDB() {
+      return new Promise((resolve, reject) => {
+        const req = indexedDB.open(DB_NAME, 1);
+        req.onupgradeneeded = (e) => {
+          const dbInstance = e.target.result;
+          if (!dbInstance.objectStoreNames.contains(STORE_RIDDLES)) {
+            dbInstance.createObjectStore(STORE_RIDDLES, { keyPath: 'id', autoIncrement: true });
+          }
+          if (!dbInstance.objectStoreNames.contains(STORE_GROUPS)) {
+            dbInstance.createObjectStore(STORE_GROUPS, { keyPath: 'id', autoIncrement: true });
+          }
+        };
+        req.onsuccess = (e) => { db = e.target.result; resolve(db); };
+        req.onerror = (e) => reject(e);
+      });
+    }
+
+    function getAllRiddles() {
+      return new Promise((resolve, reject) => {
+        const tx = db.transaction(STORE_RIDDLES, 'readonly');
+        const store = tx.objectStore(STORE_RIDDLES);
+        const req = store.getAll();
+        req.onsuccess = () => resolve(req.result);
+        req.onerror = (e) => reject(e);
+      });
+    }
+
+    function getRiddleById(id) {
+      return new Promise((resolve, reject) => {
+        const tx = db.transaction(STORE_RIDDLES, 'readonly');
+        const store = tx.objectStore(STORE_RIDDLES);
+        const req = store.get(id);
+        req.onsuccess = () => resolve(req.result);
+        req.onerror = (e) => reject(e);
+      });
+    }
+
+    function saveRiddleToDB(riddle) {
+      return new Promise((resolve, reject) => {
+        const tx = db.transaction(STORE_RIDDLES, 'readwrite');
+        const store = tx.objectStore(STORE_RIDDLES);
+        const req = (riddle.id !== undefined && riddle.id !== null && riddle.id !== '') 
+          ? store.put(riddle) 
+          : store.add(riddle);
+        req.onsuccess = () => resolve(req.result);
+        req.onerror = (e) => reject(e);
+      });
+    }
+
+    function deleteRiddleFromDB(id) {
+      return new Promise((resolve, reject) => {
+        const tx = db.transaction(STORE_RIDDLES, 'readwrite');
+        const store = tx.objectStore(STORE_RIDDLES);
+        const req = store.delete(id);
+        req.onsuccess = () => resolve();
+        req.onerror = (e) => reject(e);
+      });
+    }
+
+    function getAllGroups() {
+      return new Promise((resolve, reject) => {
+        const tx = db.transaction(STORE_GROUPS, 'readonly');
+        const store = tx.objectStore(STORE_GROUPS);
+        const req = store.getAll();
+        req.onsuccess = () => resolve(req.result);
+        req.onerror = (e) => reject(e);
+      });
+    }
+
+    function getGroupById(id) {
+      return new Promise((resolve, reject) => {
+        const tx = db.transaction(STORE_GROUPS, 'readonly');
+        const store = tx.objectStore(STORE_GROUPS);
+        const req = store.get(id);
+        req.onsuccess = () => resolve(req.result);
+        req.onerror = (e) => reject(e);
+      });
+    }
+
+    function saveGroupToDB(group) {
+      return new Promise((resolve, reject) => {
+        const tx = db.transaction(STORE_GROUPS, 'readwrite');
+        const store = tx.objectStore(STORE_GROUPS);
+        const req = (group.id !== undefined && group.id !== null && group.id !== '') 
+          ? store.put(group) 
+          : store.add(group);
+        req.onsuccess = () => resolve(req.result);
+        req.onerror = (e) => reject(e);
+      });
+    }
+
+    function deleteGroupFromDB(id) {
+      return new Promise((resolve, reject) => {
+        const tx = db.transaction(STORE_GROUPS, 'readwrite');
+        const store = tx.objectStore(STORE_GROUPS);
+        const req = store.delete(id);
+        req.onsuccess = () => resolve();
+        req.onerror = (e) => reject(e);
+      });
+    }
+
+    async function seedDemoDataIfNeeded() {
+      let groups = await getAllGroups();
+      if (groups.length > 0) return;
+
+      const audioBlob = createDemoAudioBlob();
+
+      for (let i = 1; i <= 3; i++) {
+        const groupImgBlob = await createDemoImage(`সেট ${i}`, `গ্রুপ #${i}`, '#1e3a8a');
+        const groupData = {
+          name: `সেট ${i}`,
+          pin: '1234',
+          position: 0,
+          note: '',
+          imgBlob: groupImgBlob,
+          createdAt: Date.now() + i
+        };
+
+        const groupId = await saveGroupToDB(groupData);
+
+        for (let q = 1; q <= 2; q++) {
+          const qImgBlob = await createDemoImage(`প্রশ্ন #${q}`, `সেট ${i}`, '#0284c7');
+          const aImgBlob = await createDemoImage(`উত্তর #${q}`, `সঠিক উত্তর`, '#16a34a');
+
+          await saveRiddleToDB({
+            groupId: groupId,
+            title: `সেট ${i} - প্রশ্ন #${q}`,
+            timerSec: 30,
+            isNew: q === 1 ? true : false,
+            animType: 'anim-fade',
+            qBlob: qImgBlob,
+            aBlob: aImgBlob,
+            qAudioBlob: audioBlob,
+            aAudioBlob: audioBlob,
+            createdAt: Date.now() + (i * 100) + q
+          });
+        }
+      }
+    }
+
+    function getAdminPassword() {
+      return localStorage.getItem('admin_secret_pass') || '1234';
+    }
+
+    function openAdminSecurityPrompt() {
+      const pass = prompt("অ্যাডমিন প্যানেলে প্রবেশ করতে পাসওয়ার্ড দিন:");
+      if (pass === null) return;
+      if (pass === getAdminPassword()) {
+        switchTab('admin');
+        switchAdminSection('group');
+      } else {
+        alert("ভুল পাসওয়ার্ড!");
+      }
+    }
+
+    function switchAdminSection(sectionKey) {
+      document.querySelectorAll('.admin-menu-item').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.admin-section').forEach(el => el.classList.remove('active'));
+
+      const titles = {
+        'group': 'নতুন প্রশ্ন গ্রুপ ও পিন তৈরি করুন',
+        'password': 'অ্যাডমিন পাসওয়ার্ড পরিবর্তন করুন',
+        'riddle': 'ধাঁধা, অডিও ও অ্যানিমেশন কনফিগ',
+        'reset': 'প্রশ্ন রিসেট ও র্যান্ডমাইজ সিস্টেম'
+      };
+
+      document.getElementById('adminSectionTitle').textContent = titles[sectionKey];
+      document.getElementById('sec-' + sectionKey).classList.add('active');
+      document.getElementById('menu-' + sectionKey).classList.add('active');
+    }
+
+    function handleChangePassword(e) {
+      e.preventDefault();
+      const newPass = document.getElementById('newAdminPassword').value.trim();
+      if (!newPass) return;
+      localStorage.setItem('admin_secret_pass', newPass);
+      alert("অ্যাডমিন পাসওয়ার্ড সফলভাবে পরিবর্তন করা হয়েছে!");
+      document.getElementById('newAdminPassword').value = '';
+    }
+
+    function closeAdminPanel() {
+      switchTab('game');
+    }
+
+    async function handleCreateGroup(e) {
+      e.preventDefault();
+      const name = document.getElementById('groupNameInput').value.trim();
+      const pin = document.getElementById('groupPinInput').value.trim();
+      const position = Number(document.getElementById('groupPosInput').value) || 0;
+      const note = document.getElementById('groupNoteInput').value.trim();
+      const imgFile = document.getElementById('groupImgInput').files[0];
+      const imgLink = document.getElementById('groupImgLinkInput').value.trim();
+
+      if (!name || (!imgFile && !imgLink)) {
+        alert("গ্রুপের নাম এবং ছবি (অথবা লিংক) দিন!");
+        return;
+      }
+
+      await saveGroupToDB({ 
+        name, 
+        pin, 
+        position, 
+        note, 
+        imgBlob: imgFile || null, 
+        imgLink: imgLink || '', 
+        createdAt: Date.now() 
+      });
+
+      document.getElementById('groupForm').reset();
+      document.getElementById('groupPreview').style.display = 'none';
+      await renderAdminGroups();
+    }
+
+    async function editGroupDetails(groupId) {
+      const group = await getGroupById(groupId);
+      if (!group) return;
+
+      document.getElementById('modalGroupEditId').value = group.id;
+      document.getElementById('modalGroupName').value = group.name;
+      document.getElementById('modalGroupPin').value = group.pin || '';
+      document.getElementById('modalGroupPos').value = group.position || 0;
+      document.getElementById('modalGroupNote').value = group.note || '';
+      document.getElementById('modalGroupImgLinkInput').value = group.imgLink || '';
+
+      if (group.imgBlob) {
+        const prev = document.getElementById('modalGroupImgPrev');
+        prev.src = URL.createObjectURL(group.imgBlob);
+        prev.style.display = 'block';
+      } else if (group.imgLink) {
+        const prev = document.getElementById('modalGroupImgPrev');
+        prev.src = group.imgLink;
+        prev.style.display = 'block';
+      }
+
+      document.getElementById('groupEditModal').style.display = 'flex';
+    }
+
+    function closeGroupEditModal() {
+      document.getElementById('groupEditModal').style.display = 'none';
+    }
+
+    async function handleGroupEditUpload(e) {
+      e.preventDefault();
+      const id = Number(document.getElementById('modalGroupEditId').value);
+      const group = await getGroupById(id);
+      if (!group) return;
+
+      group.name = document.getElementById('modalGroupName').value.trim();
+      group.pin = document.getElementById('modalGroupPin').value.trim();
+      group.position = Number(document.getElementById('modalGroupPos').value) || 0;
+      group.note = document.getElementById('modalGroupNote').value.trim();
+
+      const imgFile = document.getElementById('modalGroupImgFile').files[0];
+      const imgLink = document.getElementById('modalGroupImgLinkInput').value.trim();
+
+      if (imgFile) {
+        group.imgBlob = imgFile;
+        group.imgLink = '';
+      } else if (imgLink) {
+        group.imgLink = imgLink;
+        group.imgBlob = null;
+      }
+
+      await saveGroupToDB(group);
+      closeGroupEditModal();
+      await renderAdminGroups();
+      alert("গ্রুপ সফলভাবে আপডেট করা হয়েছে!");
+    }
+
+    async function deleteGroup(id) {
+      if (confirm("এই গ্রুপ ও এর অন্তর্ভুক্ত সকল প্রশ্ন মুছে ফেলতে চান?")) {
+        await deleteGroupFromDB(id);
+        let riddles = await getAllRiddles();
+        for (let r of riddles) {
+          if (r.groupId === id) {
+            await deleteRiddleFromDB(r.id);
+          }
+        }
+        await renderAdminGroups();
+        await renderAdminList();
+      }
+    }
+
+    async function resetAndRandomizeAllQuestions() {
+      if (!confirm("আপনি কি সমস্ত প্রশ্ন রিসেট ও র্যান্ডমাইজ (উল্টোপাল্টা) করতে চান?")) return;
+      
+      let riddles = await getAllRiddles();
+      if (riddles.length === 0) {
+        alert("রিসেট করার মতো কোনো প্রশ্ন নেই!");
+        return;
+      }
+
+      let baseTime = Date.now();
+      riddles.sort(() => Math.random() - 0.5);
+
+      for (let i = 0; i < riddles.length; i++) {
+        riddles[i].createdAt = baseTime + (i * 1000);
+        await saveRiddleToDB(riddles[i]);
+      }
+
+      await renderAdminList();
+      alert("সফলভাবে সমস্ত প্রশ্ন রিসেট এবং র্যান্ডমাইজ করা হয়েছে!");
+    }
+
+    async function renderAdminGroups() {
+      const groups = await getAllGroups();
+      const selectEl = document.getElementById('riddleGroupSelect');
+      const modalSelectEl = document.getElementById('modalGroupSelect');
+      const filterEl = document.getElementById('adminGroupFilter');
+      const listEl = document.getElementById('groupManageList');
+
+      groups.sort((a, b) => (b.position || 0) - (a.position || 0));
+
+      let optionsHTML = '<option value="">গ্রুপ সিলেক্ট করুন</option>';
+      let filterHTML = '<option value="all">সব গ্রুপ (সকল প্রশ্ন)</option>';
+      
+      groups.forEach(g => {
+        optionsHTML += `<option value="${g.id}">${g.name}</option>`;
+        filterHTML += `<option value="${g.id}">${g.name}</option>`;
+      });
+
+      if (selectEl) selectEl.innerHTML = optionsHTML;
+      if (modalSelectEl) modalSelectEl.innerHTML = optionsHTML;
+      if (filterEl) filterEl.innerHTML = filterHTML;
+
+      if (groups.length === 0) {
+        listEl.innerHTML = `<div style="color: #64748b; font-size: 0.85rem; text-align: center; padding: 5px;">কোনো গ্রুপ নেই। আগে একটি গ্রুপ তৈরি করুন।</div>`;
+        return;
+      }
+
+      listEl.innerHTML = '';
+      groups.forEach(g => {
+        let imgUrl = g.imgLink ? g.imgLink : (g.imgBlob ? URL.createObjectURL(g.imgBlob) : '');
+        const pinStatus = g.pin ? 'PIN: ****' : 'PIN: (মুক্ত / পিন ছাড়া)';
+        listEl.innerHTML += `
+          <div class="group-tag-item">
+            <div style="display: flex; align-items: center; gap: 10px;">
+              <img src="${imgUrl}" class="group-tag-img">
+              <div><strong>${g.name}</strong> <span style="font-size:0.75rem; color:#64748b;">(Pos: ${g.position || 0})</span><br><span style="color: #059669; font-size: 0.8rem;">${pinStatus}</span></div>
+            </div>
+            <div style="display: flex; gap: 6px;">
+              <button class="group-edit-btn" onclick="editGroupDetails(${g.id})" title="গ্রুপ এডিট করুন"><i class="fa-solid fa-pen-to-square"></i></button>
+              <button class="delete-btn" onclick="deleteGroup(${g.id})" title="গ্রুপ ডিলিট"><i class="fa-solid fa-trash-can"></i></button>
+            </div>
+          </div>`;
+      });
+    }
+
+    function previewImg(input, previewId) {
+      const preview = document.getElementById(previewId);
+      if (input.files && input.files[0]) {
+        preview.src = URL.createObjectURL(input.files[0]);
+        preview.style.display = 'block';
+      }
+    }
+
+    function indicateAudio(input, infoId) {
+      const el = document.getElementById(infoId);
+      if (input.files && input.files[0]) {
+        el.style.display = 'flex';
+        el.innerHTML = `<i class="fa-solid fa-circle-check"></i> ${input.files[0].name}`;
+      }
+    }
+
+    async function handleUpload(e) {
+      e.preventDefault();
+      const saveBtn = document.getElementById('saveBtn');
+      saveBtn.disabled = true;
+      saveBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> সেভ হচ্ছে...';
+
+      const groupId = Number(document.getElementById('riddleGroupSelect').value);
+      const title = document.getElementById('riddleTitle').value.trim() || 'ধাঁধা';
+      const timerSec = Number(document.getElementById('riddleTimerSec').value) || 30;
+      const isNew = document.getElementById('isNewRiddleCheck').checked;
+      const animType = document.getElementById('riddleAnim').value;
+      
+      const qFileIn = document.getElementById('qFileInput').files[0];
+      const qLinkIn = document.getElementById('qFileLinkInput').value.trim();
+      const aFileIn = document.getElementById('aFileInput').files[0];
+      const aLinkIn = document.getElementById('aFileLinkInput').value.trim();
+
+      const qAudioIn = document.getElementById('qAudioInput').files[0];
+      const qAudioLink = document.getElementById('qAudioLinkInput').value.trim();
+      const aAudioIn = document.getElementById('aAudioInput').files[0];
+      const aAudioLink = document.getElementById('aAudioLinkInput').value.trim();
+
+      if (!qFileIn && !qLinkIn) { alert("প্রশ্নের ছবি বা লিংক দিন!"); saveBtn.disabled = false; saveBtn.innerHTML = '<i class="fa-solid fa-plus"></i> ধাঁধা সেভ করুন'; return; }
+      if (!aFileIn && !aLinkIn) { alert("উত্তরের ছবি বা লিংক দিন!"); saveBtn.disabled = false; saveBtn.innerHTML = '<i class="fa-solid fa-plus"></i> ধাঁধা সেভ করুন'; return; }
+      if (!qAudioIn && !qAudioLink) { alert("প্রশ্নের অডিও বা লিংক দিন!"); saveBtn.disabled = false; saveBtn.innerHTML = '<i class="fa-solid fa-plus"></i> ধাঁধা সেভ করুন'; return; }
+      if (!aAudioIn && !aAudioLink) { alert("উত্তরের অডিও বা লিংক দিন!"); saveBtn.disabled = false; saveBtn.innerHTML = '<i class="fa-solid fa-plus"></i> ধাঁধা সেভ করুন'; return; }
+
+      const riddle = {
+        groupId,
+        title,
+        timerSec,
+        isNew,
+        animType,
+        qBlob: qFileIn || null,
+        qLink: qLinkIn || '',
+        aBlob: aFileIn || null,
+        aLink: aLinkIn || '',
+        qAudioBlob: qAudioIn || null,
+        qAudioLink: qAudioLink || '',
+        aAudioBlob: aAudioIn || null,
+        aAudioLink: aAudioLink || '',
+        createdAt: Date.now()
+      };
+
+      try {
+        await saveRiddleToDB(riddle);
+        document.getElementById('riddleForm').reset();
+        document.getElementById('qPreview').style.display = 'none';
+        document.getElementById('aPreview').style.display = 'none';
+        document.getElementById('qAudioInfo').style.display = 'none';
+        document.getElementById('aAudioInfo').style.display = 'none';
+        document.getElementById('riddleTimerSec').value = 30;
+        await renderAdminList();
+        alert("সফলভাবে সংরক্ষিত হয়েছে!");
+      } catch (err) {
+        alert("ত্রুটি: " + err.message);
+      } finally {
+        saveBtn.disabled = false;
+        saveBtn.innerHTML = '<i class="fa-solid fa-plus"></i> ধাঁধা সেভ করুন';
+      }
+    }
+
+    async function moveItem(index, direction) {
+      const items = await getAllRiddles();
+      const targetIndex = index + direction;
+      if (targetIndex < 0 || targetIndex >= items.length) return;
+
+      const tempTime = items[index].createdAt;
+      items[index].createdAt = items[targetIndex].createdAt;
+      items[targetIndex].createdAt = tempTime;
+
+      await saveRiddleToDB(items[index]);
+      await saveRiddleToDB(items[targetIndex]);
+      await renderAdminList();
+    }
+
+    async function editItem(id) {
+      const riddle = await getRiddleById(id);
+      if (!riddle) return;
+
+      document.getElementById('modalEditId').value = riddle.id;
+      document.getElementById('modalGroupSelect').value = riddle.groupId || '';
+      document.getElementById('modalTitle').value = riddle.title;
+      document.getElementById('modalTimerSec').value = riddle.timerSec || 30;
+      document.getElementById('modalIsNewCheck').checked = riddle.isNew || false;
+      document.getElementById('modalAnim').value = riddle.animType || 'anim-fade';
+
+      document.getElementById('modalQLinkInput').value = riddle.qLink || '';
+      document.getElementById('modalALinkInput').value = riddle.aLink || '';
+      document.getElementById('modalQAudioLinkInput').value = riddle.qAudioLink || '';
+      document.getElementById('modalAAudioLinkInput').value = riddle.aAudioLink || '';
+
+      if (riddle.qBlob) {
+        const qPrev = document.getElementById('modalQPrev');
+        qPrev.src = URL.createObjectURL(riddle.qBlob);
+        qPrev.style.display = 'block';
+      } else if (riddle.qLink) {
+        const qPrev = document.getElementById('modalQPrev');
+        qPrev.src = riddle.qLink;
+        qPrev.style.display = 'block';
+      }
+
+      if (riddle.aBlob) {
+        const aPrev = document.getElementById('modalAPrev');
+        aPrev.src = URL.createObjectURL(riddle.aBlob);
+        aPrev.style.display = 'block';
+      } else if (riddle.aLink) {
+        const aPrev = document.getElementById('modalAPrev');
+        aPrev.src = riddle.aLink;
+        aPrev.style.display = 'block';
+      }
+
+      document.getElementById('editModal').style.display = 'flex';
+    }
+
+    function closeEditModal() {
+      document.getElementById('editModal').style.display = 'none';
+    }
+
+    async function handleEditUpload(e) {
+      e.preventDefault();
+      const id = Number(document.getElementById('modalEditId').value);
+      const existingRiddle = await getRiddleById(id);
+      if (!existingRiddle) return;
+
+      existingRiddle.groupId = Number(document.getElementById('modalGroupSelect').value);
+      existingRiddle.title = document.getElementById('modalTitle').value.trim() || 'ধাঁধা';
+      existingRiddle.timerSec = Number(document.getElementById('modalTimerSec').value) || 30;
+      existingRiddle.isNew = document.getElementById('modalIsNewCheck').checked;
+      existingRiddle.animType = document.getElementById('modalAnim').value;
+
+      const qFileIn = document.getElementById('modalQFile').files[0];
+      const qLinkIn = document.getElementById('modalQLinkInput').value.trim();
+      const aFileIn = document.getElementById('modalAFile').files[0];
+      const aLinkIn = document.getElementById('modalALinkInput').value.trim();
+      const qAudioIn = document.getElementById('modalQAudio').files[0];
+      const qAudioLink = document.getElementById('modalQAudioLinkInput').value.trim();
+      const aAudioIn = document.getElementById('modalAAudio').files[0];
+      const aAudioLink = document.getElementById('modalAAudioLinkInput').value.trim();
+
+      if (qFileIn) { existingRiddle.qBlob = qFileIn; existingRiddle.qLink = ''; }
+      else if (qLinkIn) { existingRiddle.qLink = qLinkIn; existingRiddle.qBlob = null; }
+
+      if (aFileIn) { existingRiddle.aBlob = aFileIn; existingRiddle.aLink = ''; }
+      else if (aLinkIn) { existingRiddle.aLink = aLinkIn; existingRiddle.aBlob = null; }
+
+      if (qAudioIn) { existingRiddle.qAudioBlob = qAudioIn; existingRiddle.qAudioLink = ''; }
+      else if (qAudioLink) { existingRiddle.qAudioLink = qAudioLink; existingRiddle.qAudioBlob = null; }
+
+      if (aAudioIn) { existingRiddle.aAudioBlob = aAudioIn; existingRiddle.aAudioLink = ''; }
+      else if (aAudioLink) { existingRiddle.aAudioLink = aAudioLink; existingRiddle.aAudioBlob = null; }
+
+      await saveRiddleToDB(existingRiddle);
+      closeEditModal();
+      await renderAdminList();
+      alert("সফলভাবে আপডেট করা হয়েছে!");
+    }
+
+    async function renderAdminList() {
+      const listEl = document.getElementById('riddleList');
+      const countBadge = document.getElementById('countBadge');
+      const filterVal = document.getElementById('adminGroupFilter') ? document.getElementById('adminGroupFilter').value : 'all';
+
+      let items = await getAllRiddles();
+      let groups = await getAllGroups();
+      let groupMap = {};
+      groups.forEach(g => groupMap[g.id] = g.name);
+
+      if (filterVal !== 'all') {
+        items = items.filter(item => item.groupId == filterVal);
+      }
+
+      items.sort((a, b) => a.createdAt - b.createdAt);
+      if (countBadge) countBadge.textContent = items.length;
+
+      if (items.length === 0) {
+        listEl.innerHTML = `<div class="empty-state"><i class="fa-solid fa-folder-open"></i><p>কোনো প্রশ্ন নেই।</p></div>`;
+        return;
+      }
+
+      listEl.innerHTML = '';
+      items.forEach((item, idx) => {
+        const qUrl = item.qLink ? item.qLink : (item.qBlob ? URL.createObjectURL(item.qBlob) : '');
+        const aUrl = item.aLink ? item.aLink : (item.aBlob ? URL.createObjectURL(item.aBlob) : '');
+        const gName = groupMap[item.groupId] || 'অন্যান্য';
+        const newBadge = item.isNew ? `<span style="background: #059669; color: #fff; padding: 2px 6px; border-radius: 4px; font-size: 0.65rem; margin-left: 5px;">NEW</span>` : '';
+        listEl.innerHTML += `
+          <div class="riddle-item">
+            <div class="riddle-item-thumbs"><img src="${qUrl}"><img src="${aUrl}"></div>
+            <div class="riddle-item-info">
+              <div class="riddle-item-title">[${gName}] ${item.title} (#${idx + 1})${newBadge}</div>
+              <div class="riddle-item-sub"><i class="fa-solid fa-clock"></i> ${item.timerSec || 30}s | <i class="fa-solid fa-wand-magic-sparkles"></i> ${item.animType || 'anim-fade'}</div>
+            </div>
+            <div class="action-btns">
+              <button class="move-btn" onclick="moveItem(${idx}, -1)" title="উপরে নিন"><i class="fa-solid fa-arrow-up"></i></button>
+              <button class="move-btn" onclick="moveItem(${idx}, 1)" title="নিচে নিন"><i class="fa-solid fa-arrow-down"></i></button>
+              <button class="edit-btn" onclick="editItem(${item.id})" title="এডিট করুন"><i class="fa-solid fa-pen-to-square"></i></button>
+              <button class="delete-btn" onclick="deleteItem(${item.id})" title="মুছে ফেলুন"><i class="fa-solid fa-trash-can"></i></button>
+            </div>
+          </div>`;
+      });
+    }
+
+    async function deleteItem(id) {
+      if (confirm("মুছে ফেলতে চান?")) {
+        await deleteRiddleFromDB(id);
+        await renderAdminList();
+      }
+    }
+
+    function switchTab(tab) {
+      document.querySelectorAll('.tab-pane').forEach(pane => pane.classList.remove('active'));
+
+      if (tab === 'admin') {
+        document.getElementById('adminTab').classList.add('active');
+        clearInterval(timerInterval);
+        stopAllAudio();
+        renderAdminGroups();
+        renderAdminList();
+      } else {
+        document.getElementById('gameTab').classList.add('active');
+        showGroupSelectionScreen();
+      }
+    }
+
+    let riddlesList = [];
+    let currentIndex = 0;
+    let timerInterval = null;
+    const gameView = document.getElementById('gameView');
+    const CIRCLE_CIRCUMFERENCE = 182;
+
+    async function showGroupSelectionScreen() {
+      clearInterval(timerInterval);
+      stopAllAudio();
+
+      const groups = await getAllGroups();
+      const riddles = await getAllRiddles();
+
+      if (groups.length === 0) {
+        gameView.innerHTML = `<div class="empty-state"><i class="fa-solid fa-circle-exclamation"></i><p>কোনো গ্রুপ পাওয়া যায়নি!</p></div>`;
+        return;
+      }
+
+      groups.sort((a, b) => (b.position || 0) - (a.position || 0));
+
+      let html = `<div style="text-align: center; margin-bottom: 25px;"><h2 style="font-size: 1.4rem; color: #38bdf8; font-weight: 700;">অথবা একটি গ্রুপ সিলেক্ট করুন</h2><p style="color: #9ca3af; font-size: 0.9rem;">খেলার জন্য পিন দিন (যদি থাকে)</p></div>`;
+      html += `<div class="groups-grid">`;
+
+      groups.forEach(g => {
+        const count = riddles.filter(r => r.groupId === g.id).length;
+        const imgUrl = g.imgLink ? g.imgLink : (g.imgBlob ? URL.createObjectURL(g.imgBlob) : '');
+        const noteHtml = g.note ? `<div class="group-card-note">${g.note}</div>` : '';
+        const pinBoxHtml = g.pin ? `<input type="password" id="pinInput_${g.id}" class="pin-input" placeholder="পিন দিন" maxlength="6">` : `<input type="hidden" id="pinInput_${g.id}" value="">`;
+
+        html += `
+          <div class="group-card">
+            <div class="group-card-top">
+              <img src="${imgUrl}" class="group-card-img">
+              <h3>${g.name}</h3>
+              <p>প্রশ্ন সংখ্যা: ${count}টি</p>
+              ${noteHtml}
+            </div>
+            <div class="group-card-bottom">
+              ${pinBoxHtml}
+              <button class="group-enter-btn" onclick="verifyGroupPin(${g.id})">ভিতরে প্রবেশ করুন</button>
+            </div>
+          </div>`;
+      });
+
+      html += `</div>`;
+      gameView.innerHTML = html;
+    }
+
+    async function verifyGroupPin(groupId) {
+      const pinInputEl = document.getElementById(`pinInput_${groupId}`);
+      const pinVal = pinInputEl ? pinInputEl.value.trim() : '';
+      const groups = await getAllGroups();
+      const targetGroup = groups.find(g => g.id === groupId);
+
+      if (!targetGroup) return;
+
+      if (targetGroup.pin && targetGroup.pin !== pinVal) {
+        alert("ভুল পিন নম্বর! সঠিক পিন দিয়ে প্রবেশ করুন।");
+        return;
+      }
+
+      let allRiddles = await getAllRiddles();
+      riddlesList = allRiddles.filter(r => r.groupId === groupId);
+      riddlesList.sort(() => Math.random() - 0.5);
+
+      if (riddlesList.length === 0) {
+        alert("এই গ্রুপে কোনো প্রশ্ন নেই!");
+        return;
+      }
+
+      showGameLobby(targetGroup.name, targetGroup.imgLink || targetGroup.imgBlob, riddlesList.length);
+    }
+
+    function showGameLobby(title, imgSource, count) {
+      let imgTag = '';
+      if (typeof imgSource === 'string' && imgSource) {
+        imgTag = `<img src="${imgSource}">`;
+      } else if (imgSource instanceof Blob || imgSource instanceof File) {
+        imgTag = `<img src="${URL.createObjectURL(imgSource)}">`;
+      } else {
+        imgTag = `<div style="font-size: 3rem; color: #7c3aed; margin-bottom: 10px;"><i class="fa-solid fa-bolt"></i></div>`;
+      }
+
+      gameView.innerHTML = `
+        <div class="game-lobby-box">
+          ${imgTag}
+          <h2 style="font-size: 1.5rem; color: #38bdf8;">${title}</h2>
+          <p style="color: #9ca3af; font-size: 0.95rem;">মোট প্রশ্ন সংখ্যা: ${count}টি</p>
+          <div style="background: #1f2937; padding: 12px; border-radius: 10px; font-size: 0.9rem; color: #4ade80;">
+            <i class="fa-solid fa-circle-check"></i> সফলভাবে প্রবেশ করেছেন!
+          </div>
+          <button class="bpm-start-btn" onclick="startLiveGameFromUser()">
+            <i class="fa-solid fa-play"></i> শুরু করুন
+          </button>
+          <button class="bpm-back-btn" onclick="showGroupSelectionScreen()">
+            <i class="fa-solid fa-arrow-left"></i> পেছনের গ্রুপে ফিরে যান
+          </button>
+        </div>`;
+    }
+
+    function startLiveGameFromUser() {
+      initAudio();
+      loadRiddleInSingleBox(0);
+    }
+
+    function loadRiddleInSingleBox(index) {
+      currentIndex = index;
+      clearInterval(timerInterval);
+      stopAllAudio();
+      initAudio();
+
+      const riddle = riddlesList[index];
+      const qUrl = riddle.qLink ? riddle.qLink : (riddle.qBlob ? URL.createObjectURL(riddle.qBlob) : '');
+      const aUrl = riddle.aLink ? riddle.aLink : (riddle.aBlob ? URL.createObjectURL(riddle.aBlob) : '');
+      const totalSec = riddle.timerSec || 30;
+
+      gameView.innerHTML = `
+        <div class="single-screen-card">
+          <div class="status-bar question-mode" id="statusBar">
+            <button class="nav-icon-btn" onclick="prevRiddle()"><i class="fa-solid fa-arrow-left"></i> ব্যাক</button>
+            <button class="nav-icon-btn" onclick="showGroupSelectionScreen()" title="হোমে যান"><i class="fa-solid fa-house"></i> হোম</button>
+            <div class="riddle-badge-box" id="badgeNum">${index + 1}</div>
+            <button class="nav-icon-btn" onclick="skipRiddle()">স্কিপ <i class="fa-solid fa-arrow-right"></i></button>
+          </div>
+
+          <div class="stage-box">
+            <div class="clock-widget" id="clockWidget">
+              <svg class="clock-svg" viewBox="0 0 70 70">
+                <circle class="circle-track" cx="35" cy="35" r="29"></circle>
+                <circle class="circle-progress" id="circleProgress" cx="35" cy="35" r="29"></circle>
+              </svg>
+              <div class="clock-center">
+                <span class="clock-num" id="countdownClock">${totalSec}</span>
+                <span class="clock-label">SEC</span>
+              </div>
+            </div>
+
+            <img src="${qUrl}" id="mainStageImg" class="stage-image ${riddle.animType || 'anim-fade'}" alt="প্রশ্ন">
+          </div>
+        </div>
+
+        <div id="actionArea"></div>`;
+
+      const qAudioSource = riddle.qAudioLink ? riddle.qAudioLink : riddle.qAudioBlob;
+      playAudioSource(qAudioSource, () => {
+        startTickCountdown(index, riddle, aUrl);
+      });
+    }
+
+    function prevRiddle() {
+      if (currentIndex > 0) {
+        loadRiddleInSingleBox(currentIndex - 1);
+      } else {
+        alert("এটি প্রথম প্রশ্ন!");
+      }
+    }
+
+    function skipRiddle() {
+      if (currentIndex + 1 < riddlesList.length) {
+        loadRiddleInSingleBox(currentIndex + 1);
+      } else {
+        alert("এটি শেষ প্রশ্ন!");
+      }
+    }
+
+    function startTickCountdown(index, riddle, aUrl) {
+      const totalSec = riddle.timerSec || 30;
+      let timeLeft = totalSec;
+      const clockEl = document.getElementById('countdownClock');
+      const progressEl = document.getElementById('circleProgress');
+      const clockWidget = document.getElementById('clockWidget');
+      const stageImg = document.getElementById('mainStageImg');
+      const statusBar = document.getElementById('statusBar');
+      const animClass = riddle.animType || 'anim-fade';
+
+      playTickSound();
+
+      timerInterval = setInterval(() => {
+        if (currentIndex !== index) {
+          clearInterval(timerInterval);
+          return;
+        }
+
+        timeLeft--;
+        if (progressEl) {
+          const offset = CIRCLE_CIRCUMFERENCE - (timeLeft / totalSec) * CIRCLE_CIRCUMFERENCE;
+          progressEl.style.strokeDashoffset = offset;
+        }
+
+        if (timeLeft > 0) {
+          if (clockEl) clockEl.textContent = timeLeft;
+          if (timeLeft <= 5) {
+            playTingSound();
+            if (clockWidget) clockWidget.style.borderColor = '#ef4444';
+            if (progressEl) progressEl.style.stroke = '#ef4444';
+          } else {
+            playTickSound();
+          }
+        } else {
+          clearInterval(timerInterval);
+          if (clockWidget) clockWidget.style.display = 'none';
+          playCelebrationSound();
+
+          if (stageImg) {
+            if (animClass !== 'anim-off') {
+              stageImg.classList.add('out');
+            }
+
+            const animDelay = animClass === 'anim-off' ? 0 : 400;
+
+            setTimeout(() => {
+              if (currentIndex !== index) return;
+              stageImg.src = aUrl;
+              if (animClass !== 'anim-off') {
+                stageImg.classList.remove('out');
+              }
+
+              if (statusBar) {
+                statusBar.className = 'status-bar answer-mode';
+                statusBar.innerHTML = `
+                  <button class="nav-icon-btn" onclick="prevRiddle()"><i class="fa-solid fa-arrow-left"></i> ব্যাক</button>
+                  <button class="nav-icon-btn" onclick="showGroupSelectionScreen()" title="হোমে যান"><i class="fa-solid fa-house"></i> হোম</button>
+                  <div class="riddle-badge-box" id="badgeNum">${index + 1}</div>
+                  <button class="nav-icon-btn" onclick="skipRiddle()">স্কিপ <i class="fa-solid fa-arrow-right"></i></button>`;
+              }
+
+              const aAudioSource = riddle.aAudioLink ? riddle.aAudioLink : riddle.aAudioBlob;
+              playAudioSource(aAudioSource, () => {});
+
+              showNextControl(index);
+            }, animDelay);
+          }
+        }
+      }, 1000);
+    }
+
+    function showNextControl(index) {
+      const actionArea = document.getElementById('actionArea');
+      if (!actionArea) return;
+      if (index + 1 < riddlesList.length) {
+        actionArea.innerHTML = `<button class="next-step-btn" onclick="loadRiddleInSingleBox(${index + 1})">পরবর্তী ধাঁধা ➔</button>`;
+      } else {
+        actionArea.innerHTML = `<button class="next-step-btn" style="background: #10b981;" onclick="showGroupSelectionScreen()">সব গ্রুপ দেখুন ↺</button>`;
+      }
+    }
+
+    window.onload = async () => {
+      await openDB();
+      await seedDemoDataIfNeeded();
+      await renderAdminGroups();
+      await renderAdminList();
+      showGroupSelectionScreen();
+    };
+  </script>
+</body>
+</html>
