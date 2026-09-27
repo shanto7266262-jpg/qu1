@@ -11,7 +11,7 @@
     <!-- Google Fonts Poppins -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
-    <!-- Firebase Compat SDKs (Storage SDK সরানো হয়েছে) -->
+    <!-- Firebase Compat SDKs (Storage SDK সরানো হয়েছে, শুধুমাত্র Realtime DB) -->
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-database-compat.js"></script>
 
@@ -53,12 +53,9 @@
         </div>
     </header>
 
-    <!-- <!-- Floating Admin Settings Button (Hidden until hovered) -->
-    <button onclick="checkAdminAccess()" id="floatingAdminBtn" class="fixed bottom-6 left-6 z-50 w-12 h-12 opacity-0 hover:opacity-100 rounded-full bg-slate-800 text-slate-300 hover:text-white hover:bg-slate-700 border border-slate-700 shadow-xl shadow-black/50 flex items-center justify-center transition-all duration-300 group">
-        <i class="fa-solid fa-gear text-lg group-hover:rotate-90 transition-transform duration-500"></i>
-    </button> -->
-    <button onclick="checkAdminAccess()" id="floatingAdminBtn" class="fixed bottom-6 left-6 z-50 w-12 h-12 rounded-full bg-slate-800 text-slate-300 hover:text-white hover:bg-slate-700 border border-slate-700 shadow-xl shadow-black/50 flex items-center justify-center transition-all group">
-        <i class="fa-solid fa-gear text-lg group-hover:rotate-90 transition-transform duration-500"></i>
+    <!-- Secret Admin Settings Button (Completely Hidden on Home) -->
+    <button onclick="handleSecretClick()" id="floatingAdminBtn" class="fixed bottom-0 left-0 z-50 w-24 h-24 opacity-0 cursor-default bg-transparent">
+        <i class="fa-solid fa-gear text-lg"></i>
     </button>
 
     <!-- Main Container -->
@@ -129,7 +126,11 @@
                 </div>
                 <div class="flex flex-wrap gap-2">
                     <button onclick="openChangePasswordModal()" class="px-4 py-2 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/30 text-sm font-medium transition-all flex items-center">
-                        <i class="fa-solid fa-key mr-2"></i> পাসওয়ার্ড পরিবর্তন
+                        <i class="fa-solid fa-key mr-2"></i> পাসওয়ার্ড
+                    </button>
+                    <!-- New Security Setting Button -->
+                    <button onclick="openSecuritySettingsModal()" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-sm font-medium transition-all flex items-center">
+                        <i class="fa-solid fa-shield-halved mr-2 text-rose-400"></i> সিকিউরিটি সেটিং
                     </button>
                     <button onclick="openSiteSettingsModal()" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-sm font-medium transition-all flex items-center">
                         <i class="fa-solid fa-globe mr-2 text-blue-400"></i> সাইট সেটিং
@@ -354,6 +355,29 @@
         </div>
     </div>
 
+    <!-- SECURITY SETTINGS MODAL -->
+    <div id="securitySettingsModal" class="fixed inset-0 z-[60] bg-black/80 backdrop-blur-md hidden items-center justify-center p-4 transition-all">
+        <div class="bg-slate-900 border border-slate-800 rounded-3xl w-full max-w-sm p-6 sm:p-8 space-y-6 shadow-2xl">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-4">
+                <h3 class="text-xl font-bold text-white">সিকিউরিটি সেটিং</h3>
+                <button onclick="closeSecuritySettingsModal()" class="w-9 h-9 rounded-full bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center transition-all">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <form id="securitySettingsForm" onsubmit="handleSecuritySettingsSubmit(event)" class="space-y-4">
+                <div>
+                    <label class="block text-sm font-medium text-slate-300 mb-1">অ্যাডমিন প্যানেল সিক্রেট ক্লিক সংখ্যা</label>
+                    <input type="number" id="secClickThreshold" min="1" max="50" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-indigo-500">
+                    <p class="text-[10px] text-slate-500 mt-1">স্ক্রিনের নিচে বাম কোণায় এতবার ক্লিক করলে লগিন প্যানেল আসবে।</p>
+                </div>
+                <div class="flex justify-end space-x-3 pt-4 border-t border-slate-800">
+                    <button type="button" onclick="closeSecuritySettingsModal()" class="px-5 py-2.5 rounded-xl bg-slate-800 text-slate-300 hover:bg-slate-700 text-sm font-medium transition-all">বাতিল</button>
+                    <button type="submit" id="saveSecurityBtn" class="px-6 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-medium shadow-lg shadow-indigo-600/30 transition-all">সেভ করুন</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
     <!-- Toast Notification Container -->
     <div id="toastContainer" class="fixed bottom-5 right-5 z-[100] space-y-2"></div>
 
@@ -372,7 +396,7 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        // 1:1 Aspect Ratio Demo Generator (5 per category)
+        // 1:1 Aspect Ratio Demo Generator
         const demoImages = [
             "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe",
             "https://images.unsplash.com/photo-1550745165-9bc0b252726f",
@@ -412,7 +436,7 @@
             img2: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=1200&h=400&fit=crop",
             img3: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=1200&h=400&fit=crop"
         };
-        const initialSiteSettings = { siteName: "ViralPrompts", subtitle: "Top Trending Topics", logoUrl: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&h=100&fit=crop" };
+        const initialSiteSettings = { siteName: "ViralPrompts", subtitle: "Top Trending Topics", logoUrl: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&h=100&fit=crop", adminClickThreshold: 3 };
 
         let categories = [];
         let prompts = [];
@@ -423,8 +447,28 @@
         // Admin Security States
         let currentAdminPassword = "admin";
         let isAuthenticated = false;
+        let secretClickCount = 0;
+        let secretClickTimer;
 
         // ================= ADMIN SECURITY FUNCTIONS =================
+        function handleSecretClick() {
+            if (!document.getElementById('adminView').classList.contains('hidden')) return;
+
+            secretClickCount++;
+            clearTimeout(secretClickTimer);
+            
+            let threshold = siteSettings.adminClickThreshold || 3;
+            
+            if (secretClickCount >= threshold) {
+                secretClickCount = 0;
+                checkAdminAccess();
+            } else {
+                secretClickTimer = setTimeout(() => {
+                    secretClickCount = 0;
+                }, 1500);
+            }
+        }
+
         function checkAdminAccess() {
             if(isAuthenticated) {
                 switchView('admin');
@@ -486,16 +530,14 @@
                         let height = img.height;
                         
                         if (forceSquare) {
-                            // Crop logic for 1:1 square
                             const size = Math.min(width, height);
                             const startX = (width - size) / 2;
                             const startY = (height - size) / 2;
                             canvas.width = maxWidth;
-                            canvas.height = maxHeight; // maxWidth = maxHeight here
+                            canvas.height = maxHeight;
                             const ctx = canvas.getContext('2d');
                             ctx.drawImage(img, startX, startY, size, size, 0, 0, maxWidth, maxHeight);
                         } else {
-                            // Normal scaling
                             if (width > height) {
                                 if (width > maxWidth) { height = Math.round(height * (maxWidth / width)); width = maxWidth; }
                             } else {
@@ -544,7 +586,6 @@
                         });
                         prompts.sort((a, b) => b.timestamp - a.timestamp);
                     } else {
-                        // Insert 45 generated demos if database is completely empty
                         generatedPrompts.forEach(p => db.ref('prompts').push(p));
                     }
                     renderCategorySections();
@@ -556,7 +597,7 @@
         }
 
         // ================= VIEW SWITCHER =================
-        function  {
+        function switchView(view) {
             document.getElementById('homeView').classList.add('hidden');
             document.getElementById('adminView').classList.add('hidden');
             document.getElementById('detailsView').classList.add('hidden');
@@ -564,11 +605,11 @@
 
             if(view === 'home') {
                 document.getElementById('homeView').classList.remove('hidden');
-                adminBtn.className = "fixed bottom-6 left-6 z-50 w-12 h-12 rounded-full bg-slate-800 text-slate-300 hover:text-white hover:bg-slate-700 border border-slate-700 shadow-xl shadow-black/50 flex items-center justify-center transition-all group";
+                adminBtn.className = "fixed bottom-0 left-0 z-50 w-24 h-24 opacity-0 cursor-default bg-transparent";
                 renderCategorySections();
             } else if(view === 'admin') {
                 document.getElementById('adminView').classList.remove('hidden');
-                adminBtn.className = "fixed bottom-6 left-6 z-50 w-12 h-12 rounded-full bg-indigo-600 text-white hover:bg-indigo-500 shadow-xl shadow-indigo-600/50 flex items-center justify-center transition-all group border border-indigo-400";
+                adminBtn.className = "fixed bottom-6 left-6 z-50 w-12 h-12 opacity-100 rounded-full bg-indigo-600 text-white shadow-xl shadow-indigo-600/50 flex items-center justify-center transition-all duration-300 group border border-indigo-400 cursor-pointer";
             } else if(view === 'details') {
                 document.getElementById('detailsView').classList.remove('hidden');
                 window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -748,11 +789,24 @@
             e.preventDefault();
             const btn = document.getElementById('saveSiteBtn'); btn.disabled = true; btn.innerText = "সেভ হচ্ছে...";
             try {
-                siteSettings.siteName = document.getElementById('ssSiteName').value; siteSettings.subtitle = document.getElementById('ssSubtitle').value;
+                siteSettings.siteName = document.getElementById('ssSiteName').value; 
+                siteSettings.subtitle = document.getElementById('ssSubtitle').value;
+                
                 const f = document.getElementById('siteLogoFile').files[0];
                 if (f) { showToast("লোগো প্রসেস হচ্ছে..."); siteSettings.logoUrl = await compressImage(f, 200, 200, 0.7, true); }
                 await db.ref('appState/config/siteSettings').set(siteSettings);
                 closeSiteSettingsModal(); showToast("আপডেট হয়েছে!");
+            } catch (err) { alert("সমস্যা হয়েছে!"); }
+            finally { btn.innerText = "সেভ করুন"; btn.disabled = false; }
+        }
+
+        async function handleSecuritySettingsSubmit(e) {
+            e.preventDefault();
+            const btn = document.getElementById('saveSecurityBtn'); btn.disabled = true; btn.innerText = "সেভ হচ্ছে...";
+            try {
+                siteSettings.adminClickThreshold = parseInt(document.getElementById('secClickThreshold').value) || 3;
+                await db.ref('appState/config/siteSettings').set(siteSettings);
+                closeSecuritySettingsModal(); showToast("সিকিউরিটি সেটিং আপডেট হয়েছে!");
             } catch (err) { alert("সমস্যা হয়েছে!"); }
             finally { btn.innerText = "সেভ করুন"; btn.disabled = false; }
         }
@@ -763,8 +817,22 @@
         function editPrompt(idx) { const p = prompts[idx]; document.getElementById('modalTitle').innerText = "প্রম্পট এডিট"; document.getElementById('editIndex').value = idx; document.getElementById('promptTitle').value = p.title; document.getElementById('promptCategory').value = p.category; document.getElementById('promptBadge').value = p.badge; document.getElementById('viewCount1').value = p.view1; document.getElementById('viewCount2').value = p.view2; document.getElementById('viewCount3').value = p.view3; document.getElementById('promptsFieldsContainer').innerHTML = ""; let list = p.promptsList || [{ name: "Main Prompt", text: p.content || "" }]; list.forEach(item => addPromptField(item.name, item.text)); document.getElementById('promptModal').classList.replace('hidden','flex'); }
         function openHeroSettingsModal() { document.getElementById('hsMainTitle').value = heroSettings.mainTitle; document.getElementById('hsMarqueeText').value = heroSettings.marqueeText; document.getElementById('heroSettingsForm').reset(); document.getElementById('heroSettingsModal').classList.replace('hidden','flex'); }
         function closeHeroSettingsModal() { document.getElementById('heroSettingsModal').classList.replace('flex','hidden'); }
-        function openSiteSettingsModal() { document.getElementById('ssSiteName').value = siteSettings.siteName; document.getElementById('ssSubtitle').value = siteSettings.subtitle; document.getElementById('siteSettingsForm').reset(); document.getElementById('siteSettingsModal').classList.replace('hidden','flex'); }
+        
+        function openSiteSettingsModal() { 
+            document.getElementById('ssSiteName').value = siteSettings.siteName; 
+            document.getElementById('ssSubtitle').value = siteSettings.subtitle; 
+            document.getElementById('siteSettingsForm').reset(); 
+            document.getElementById('siteSettingsModal').classList.replace('hidden','flex'); 
+        }
         function closeSiteSettingsModal() { document.getElementById('siteSettingsModal').classList.replace('flex','hidden'); }
+        
+        function openSecuritySettingsModal() { 
+            document.getElementById('secClickThreshold').value = siteSettings.adminClickThreshold || 3;
+            document.getElementById('securitySettingsForm').reset(); 
+            document.getElementById('securitySettingsModal').classList.replace('hidden','flex'); 
+        }
+        function closeSecuritySettingsModal() { document.getElementById('securitySettingsModal').classList.replace('flex','hidden'); }
+
         function addPromptField(name = '', text = '') { const id = 'row_' + Date.now(); const div = document.createElement('div'); div.className = "flex flex-col sm:flex-row gap-2 bg-slate-900 p-3 rounded-xl border border-slate-800 relative"; div.id = id; div.innerHTML = `<div class="flex-1 space-y-2"><input type="text" placeholder="নাম..." value="${name}" class="prompt-name-input w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-xs text-white focus:border-indigo-500" required><textarea rows="2" placeholder="টেক্সট..." class="prompt-text-input w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-xs text-white focus:border-indigo-500" required>${text}</textarea></div><button type="button" onclick="document.getElementById('${id}').remove()" class="px-3 py-2 bg-rose-500/20 text-rose-400 hover:bg-rose-500/30 text-xs rounded-lg transition-all"><i class="fa-solid fa-trash"></i></button>`; document.getElementById('promptsFieldsContainer').appendChild(div); }
 
         function openDetailsPage(p) {
