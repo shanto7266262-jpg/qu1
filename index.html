@@ -17,23 +17,13 @@
 
     <style>
         body { font-family: 'Poppins', sans-serif; }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
         .animate-page { animation: fadeIn 0.3s ease-out forwards; }
-        @keyframes slideIn {
-            from { opacity: 0; transform: translateY(1rem); }
-            to { opacity: 1; transform: translateY(0); }
-        }
+        @keyframes slideIn { from { opacity: 0; transform: translateY(1rem); } to { opacity: 1; transform: translateY(0); } }
         .animate-toast { animation: slideIn 0.3s ease-out forwards; }
-        .viral-card {
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        .viral-card:hover {
-            transform: translateY(-6px);
-            box-shadow: 0 20px 30px -10px rgba(99, 102, 241, 0.25);
-        }
+        .viral-card { transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+        .viral-card:hover { transform: translateY(-6px); box-shadow: 0 20px 30px -10px rgba(99, 102, 241, 0.25); }
+        @keyframes marquee { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
     </style>
 </head>
 <body class="bg-slate-950 text-slate-100 min-h-screen relative">
@@ -43,7 +33,7 @@
         <!-- Marquee Announcement -->
         <div class="bg-indigo-600/20 border-b border-indigo-500/30 overflow-hidden py-1.5 flex items-center">
             <div class="whitespace-nowrap animate-[marquee_20s_linear_infinite] text-xs font-medium text-indigo-300" id="marqueeTextContainer">
-                <i class="fa-solid fa-bolt text-amber-400 mx-2"></i> Trending Now: Cyberpunk Metaverse Avatars <i class="fa-solid fa-bolt text-amber-400 mx-2"></i> Hot Upload: Cinematic Drone Shots <i class="fa-solid fa-bolt text-amber-400 mx-2"></i> New: ASMR Kinetic Sand
+                <i class="fa-solid fa-bolt text-amber-400 mx-2"></i> Trending Now: Cyberpunk Metaverse Avatars <i class="fa-solid fa-bolt text-amber-400 mx-2"></i> Hot Upload: Cinematic Drone Shots
             </div>
         </div>
 
@@ -55,7 +45,6 @@
                     <p id="siteSubtitle" class="text-[10px] text-slate-400">Top Trending Topics</p>
                 </div>
             </div>
-            <!-- Home button inside header -->
             <nav class="flex items-center">
                 <button onclick="switchView('home')" id="navHomeBtn" class="px-4 py-1.5 rounded-xl text-xs font-medium transition-all bg-indigo-600 text-white shadow-lg shadow-indigo-600/30">
                     <i class="fa-solid fa-house mr-1.5"></i> হোমপেজ
@@ -64,15 +53,8 @@
         </div>
     </header>
 
-    <style>
-        @keyframes marquee {
-            0% { transform: translateX(100%); }
-            100% { transform: translateX(-100%); }
-        }
-    </style>
-
     <!-- Floating Admin Settings Button -->
-    <button onclick="switchView('admin')" id="floatingAdminBtn" class="fixed bottom-6 left-6 z-50 w-12 h-12 rounded-full bg-slate-800 text-slate-300 hover:text-white hover:bg-slate-700 border border-slate-700 shadow-xl shadow-black/50 flex items-center justify-center transition-all group">
+    <button onclick="checkAdminAccess()" id="floatingAdminBtn" class="fixed bottom-6 left-6 z-50 w-12 h-12 rounded-full bg-slate-800 text-slate-300 hover:text-white hover:bg-slate-700 border border-slate-700 shadow-xl shadow-black/50 flex items-center justify-center transition-all group">
         <i class="fa-solid fa-gear text-lg group-hover:rotate-90 transition-transform duration-500"></i>
     </button>
 
@@ -94,7 +76,6 @@
                         <img src="https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=1200&h=400&fit=crop" class="w-full h-full object-cover flex-shrink-0" alt="Slide 2">
                         <img src="https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=1200&h=400&fit=crop" class="w-full h-full object-cover flex-shrink-0" alt="Slide 3">
                     </div>
-                    <!-- Slider Controls -->
                     <button onclick="prevSlide()" class="absolute left-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/50 backdrop-blur-md text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-indigo-600 border border-white/10"><i class="fa-solid fa-chevron-left"></i></button>
                     <button onclick="nextSlide()" class="absolute right-4 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/50 backdrop-blur-md text-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity hover:bg-indigo-600 border border-white/10"><i class="fa-solid fa-chevron-right"></i></button>
                 </div>
@@ -130,7 +111,7 @@
 
             <div class="space-y-4">
                 <h3 class="text-lg font-bold text-white flex items-center">
-                    <i class="fa-solid fa-images mr-2 text-violet-400"></i> থাম্বনেইল ইমেজসমূহ
+                    <i class="fa-solid fa-images mr-2 text-violet-400"></i> থাম্বনেইল ইমেজসমূহ (1:1 Ratio)
                 </h3>
                 <div id="detailImagesList" class="grid grid-cols-1 sm:grid-cols-3 gap-4"></div>
             </div>
@@ -141,14 +122,17 @@
             <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 bg-slate-900 p-6 rounded-2xl border border-slate-800">
                 <div>
                     <h2 class="text-2xl font-bold text-white"><i class="fa-solid fa-gauge-high mr-2 text-indigo-500"></i> অ্যাডমিন ড্যাশবোর্ড</h2>
-                    <p class="text-slate-400 text-sm mt-1">একাধিক প্রম্পট ও ছবিসহ নতুন পোস্ট বা ক্যাটাগরি ম্যানেজ করুন।</p>
+                    <p class="text-slate-400 text-sm mt-1">একাধিক প্রম্পট, সেটিং ও সিকিউরিটি ম্যানেজ করুন।</p>
                 </div>
                 <div class="flex flex-wrap gap-2">
+                    <button onclick="openChangePasswordModal()" class="px-4 py-2 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/30 text-sm font-medium transition-all flex items-center">
+                        <i class="fa-solid fa-key mr-2"></i> পাসওয়ার্ড পরিবর্তন
+                    </button>
                     <button onclick="openSiteSettingsModal()" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-sm font-medium transition-all flex items-center">
                         <i class="fa-solid fa-globe mr-2 text-blue-400"></i> সাইট সেটিং
                     </button>
                     <button onclick="openHeroSettingsModal()" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-sm font-medium transition-all flex items-center">
-                        <i class="fa-solid fa-images mr-2 text-emerald-400"></i> হিরো সেকশন সেটিং
+                        <i class="fa-solid fa-images mr-2 text-emerald-400"></i> হিরো সেটিং
                     </button>
                     <button onclick="openPromptModal()" class="px-5 py-2.5 rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 text-white font-medium shadow-lg shadow-indigo-600/30 hover:opacity-95 transition-all flex items-center justify-center">
                         <i class="fa-solid fa-plus mr-2"></i> নতুন প্রম্পট
@@ -162,7 +146,7 @@
                         <i class="fa-solid fa-tags mr-2 text-indigo-400"></i> ক্যাটাগরি ম্যানেজমেন্ট
                     </h3>
                     <div class="flex gap-2">
-                        <input type="text" id="newCategoryInput" placeholder="নতুন ক্যাটাগরি নাম..." class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-4 py-2 text-sm text-white focus:outline-none focus:border-indigo-500">
+                        <input type="text" id="newCategoryInput" placeholder="নতুন ক্যাটাগরি..." class="flex-1 bg-slate-950 border border-slate-800 rounded-xl px-4 py-2 text-sm text-white focus:outline-none focus:border-indigo-500">
                         <button onclick="addCategory()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-medium rounded-xl transition-all">যোগ</button>
                     </div>
                     <div id="adminCategoryList" class="space-y-2 max-h-80 overflow-y-auto pr-1"></div>
@@ -180,6 +164,49 @@
     </main>
 
     <!-- ================= MODALS ================= -->
+
+    <!-- LOGIN MODAL -->
+    <div id="loginModal" class="fixed inset-0 z-[80] bg-black/80 backdrop-blur-md hidden items-center justify-center p-4 transition-all">
+        <div class="bg-slate-900 border border-slate-800 rounded-3xl w-full max-w-sm p-6 sm:p-8 space-y-6 shadow-2xl">
+            <div class="text-center space-y-2">
+                <div class="w-12 h-12 bg-indigo-500/20 text-indigo-400 rounded-full flex items-center justify-center mx-auto mb-4 text-xl">
+                    <i class="fa-solid fa-lock"></i>
+                </div>
+                <h3 class="text-xl font-bold text-white">অ্যাডমিন লগিন</h3>
+                <p class="text-xs text-slate-400">অ্যাডমিন প্যানেলে প্রবেশ করতে পাসওয়ার্ড দিন</p>
+            </div>
+            <form onsubmit="handleLogin(event)" class="space-y-4">
+                <div>
+                    <input type="password" id="adminPwInput" required placeholder="পাসওয়ার্ড লিখুন..." class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-center text-white focus:outline-none focus:border-indigo-500 tracking-widest">
+                </div>
+                <div class="flex space-x-3 pt-2">
+                    <button type="button" onclick="closeLoginModal()" class="flex-1 py-2.5 rounded-xl bg-slate-800 text-slate-300 hover:bg-slate-700 text-sm font-medium transition-all">বাতিল</button>
+                    <button type="submit" class="flex-1 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-medium shadow-lg shadow-indigo-600/30 transition-all">প্রবেশ করুন</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- CHANGE PASSWORD MODAL -->
+    <div id="changePasswordModal" class="fixed inset-0 z-[80] bg-black/80 backdrop-blur-md hidden items-center justify-center p-4 transition-all">
+        <div class="bg-slate-900 border border-slate-800 rounded-3xl w-full max-w-sm p-6 sm:p-8 space-y-6 shadow-2xl">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-4">
+                <h3 class="text-lg font-bold text-white">পাসওয়ার্ড পরিবর্তন</h3>
+                <button onclick="closeChangePasswordModal()" class="w-8 h-8 rounded-full bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center transition-all">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+            </div>
+            <form onsubmit="handleChangePassword(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-medium text-slate-400 mb-1">নতুন পাসওয়ার্ড</label>
+                    <input type="text" id="newAdminPwInput" required placeholder="নতুন পাসওয়ার্ড লিখুন" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-3 text-sm text-white focus:outline-none focus:border-indigo-500">
+                </div>
+                <div class="pt-2">
+                    <button type="submit" class="w-full py-2.5 rounded-xl bg-amber-600 hover:bg-amber-500 text-white text-sm font-medium shadow-lg shadow-amber-600/30 transition-all">পরিবর্তন করুন</button>
+                </div>
+            </form>
+        </div>
+    </div>
     
     <!-- ADD/EDIT PROMPT MODAL -->
     <div id="promptModal" class="fixed inset-0 z-[60] bg-black/80 backdrop-blur-md hidden items-center justify-center p-4 transition-all">
@@ -210,8 +237,9 @@
                         </select>
                     </div>
                 </div>
+                <!-- 1:1 Image Uploads -->
                 <div class="space-y-3 bg-slate-950 p-4 rounded-2xl border border-slate-800/80">
-                    <label class="block text-sm font-medium text-indigo-400"><i class="fa-solid fa-images mr-1"></i> ৩টি ইমেজ ও ভিউ কাউন্ট</label>
+                    <label class="block text-sm font-medium text-indigo-400"><i class="fa-solid fa-images mr-1"></i> ৩টি ইমেজ (1:1 Ratio) ও ভিউ কাউন্ট</label>
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 items-center bg-slate-900 p-3 rounded-xl border border-slate-800">
                         <div class="sm:col-span-2">
                             <label class="text-xs text-slate-400 block mb-1">ছবি ১</label>
@@ -262,7 +290,7 @@
     <div id="heroSettingsModal" class="fixed inset-0 z-[60] bg-black/80 backdrop-blur-md hidden items-center justify-center p-4 transition-all">
         <div class="bg-slate-900 border border-slate-800 rounded-3xl w-full max-w-2xl p-6 sm:p-8 space-y-6 shadow-2xl">
             <div class="flex items-center justify-between border-b border-slate-800 pb-4">
-                <h3 class="text-xl font-bold text-white">হিরো সেকশন সেটিং (Hero Settings)</h3>
+                <h3 class="text-xl font-bold text-white">হিরো সেকশন সেটিং</h3>
                 <button onclick="closeHeroSettingsModal()" class="w-9 h-9 rounded-full bg-slate-800 text-slate-400 hover:text-white flex items-center justify-center transition-all">
                     <i class="fa-solid fa-xmark"></i>
                 </button>
@@ -280,18 +308,9 @@
                     <label class="block text-sm font-medium text-indigo-400"><i class="fa-solid fa-images mr-1"></i> স্লাইডার ইমেজ আপডেট (ঐচ্ছিক)</label>
                     <p class="text-xs text-slate-500 mb-2">নতুন ছবি সিলেক্ট না করলে আগের ছবিই থাকবে।</p>
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                        <div>
-                            <label class="text-xs text-slate-400 block mb-1">স্লাইড ছবি ১</label>
-                            <input type="file" id="heroImgFile1" accept="image/*" class="w-full text-xs text-slate-400 file:mr-2 file:py-1 file:px-2 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-indigo-600 file:text-white hover:file:bg-indigo-500 cursor-pointer">
-                        </div>
-                        <div>
-                            <label class="text-xs text-slate-400 block mb-1">স্লাইড ছবি ২</label>
-                            <input type="file" id="heroImgFile2" accept="image/*" class="w-full text-xs text-slate-400 file:mr-2 file:py-1 file:px-2 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-indigo-600 file:text-white hover:file:bg-indigo-500 cursor-pointer">
-                        </div>
-                        <div>
-                            <label class="text-xs text-slate-400 block mb-1">স্লাইড ছবি ৩</label>
-                            <input type="file" id="heroImgFile3" accept="image/*" class="w-full text-xs text-slate-400 file:mr-2 file:py-1 file:px-2 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-indigo-600 file:text-white hover:file:bg-indigo-500 cursor-pointer">
-                        </div>
+                        <div><input type="file" id="heroImgFile1" accept="image/*" class="w-full text-xs text-slate-400 file:mr-2 file:py-1 file:px-2 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-indigo-600 file:text-white hover:file:bg-indigo-500 cursor-pointer"></div>
+                        <div><input type="file" id="heroImgFile2" accept="image/*" class="w-full text-xs text-slate-400 file:mr-2 file:py-1 file:px-2 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-indigo-600 file:text-white hover:file:bg-indigo-500 cursor-pointer"></div>
+                        <div><input type="file" id="heroImgFile3" accept="image/*" class="w-full text-xs text-slate-400 file:mr-2 file:py-1 file:px-2 file:rounded-md file:border-0 file:text-xs file:font-semibold file:bg-indigo-600 file:text-white hover:file:bg-indigo-500 cursor-pointer"></div>
                     </div>
                 </div>
                 <div class="flex justify-end space-x-3 pt-4 border-t border-slate-800">
@@ -333,7 +352,7 @@
     </div>
 
     <!-- Toast Notification Container -->
-    <div id="toastContainer" class="fixed bottom-5 right-5 z-[70] space-y-2"></div>
+    <div id="toastContainer" class="fixed bottom-5 right-5 z-[100] space-y-2"></div>
 
     <!-- JavaScript Logic -->
     <script>
@@ -350,12 +369,39 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        // Defaults
-        const initialCategories = [
-            "ALL", "VIRAL TOPIC", "NEW TOPIC", "CHANNEL", "ASMR & SATISFYING", 
-            "ANIMAL & PETS", "COMEDY & ENTERTAINMENT", "TECHNOLOGY", "GAMING", "CINEMATIC"
+        // 1:1 Aspect Ratio Demo Generator (5 per category)
+        const demoImages = [
+            "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe",
+            "https://images.unsplash.com/photo-1550745165-9bc0b252726f",
+            "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5",
+            "https://images.unsplash.com/photo-1536440136628-849c177e76a1",
+            "https://images.unsplash.com/photo-1511497584788-876761142197",
+            "https://images.unsplash.com/photo-1505118380757-91f5f5632de0"
         ];
         
+        const initialCategories = ["ALL", "VIRAL TOPIC", "NEW TOPIC", "CHANNEL", "ASMR & SATISFYING", "ANIMAL & PETS", "COMEDY & ENTERTAINMENT", "TECHNOLOGY", "GAMING", "CINEMATIC"];
+        let generatedPrompts = [];
+        
+        initialCategories.filter(c => c !== "ALL").forEach((cat, index) => {
+            for(let i=1; i<=5; i++) {
+                let imgBase1 = demoImages[(index + i) % demoImages.length];
+                let imgBase2 = demoImages[(index + i + 1) % demoImages.length];
+                let imgBase3 = demoImages[(index + i + 2) % demoImages.length];
+                
+                generatedPrompts.push({
+                    title: `Epic ${cat} Content Idea #${i}`,
+                    category: cat,
+                    badge: i % 2 === 0 ? "Premium" : (i === 3 ? "Free" : "Trending"),
+                    img1: `${imgBase1}?w=400&h=400&fit=crop`, view1: (10 + i) + "M",
+                    img2: `${imgBase2}?w=400&h=400&fit=crop`, view2: (15 + i) + "M",
+                    img3: `${imgBase3}?w=400&h=400&fit=crop`, view3: (20 + i) + "M",
+                    promptsList: [{ name: "Main Prompt", text: `High quality hyper-realistic 8k cinematic shot for ${cat} concept ${i}. Make it extremely detailed and aesthetic.` }],
+                    content: `High quality hyper-realistic 8k cinematic shot for ${cat} concept ${i}.`,
+                    timestamp: Date.now() - (i * 1000)
+                });
+            }
+        });
+
         const initialHeroSettings = {
             mainTitle: "Viral Prompts Tap, Copy, Create",
             marqueeText: '<i class="fa-solid fa-bolt text-amber-400 mx-2"></i> Trending Now: Cyberpunk Metaverse Avatars <i class="fa-solid fa-bolt text-amber-400 mx-2"></i> Hot Upload: Cinematic Drone Shots <i class="fa-solid fa-bolt text-amber-400 mx-2"></i> New: ASMR Kinetic Sand',
@@ -363,21 +409,68 @@
             img2: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=1200&h=400&fit=crop",
             img3: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=1200&h=400&fit=crop"
         };
-
-        const initialSiteSettings = {
-            siteName: "ViralPrompts",
-            subtitle: "Top Trending Topics",
-            logoUrl: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&h=100&fit=crop"
-        };
+        const initialSiteSettings = { siteName: "ViralPrompts", subtitle: "Top Trending Topics", logoUrl: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=100&h=100&fit=crop" };
 
         let categories = [];
         let prompts = [];
         let siteSettings = {};
         let heroSettings = {};
         let activeCategory = "ALL";
+        
+        // Admin Security States
+        let currentAdminPassword = "admin";
+        let isAuthenticated = false;
 
-        // ================= IMAGE COMPRESSION LOGIC =================
-        const compressImage = (file, maxWidth, maxHeight, quality) => {
+        // ================= ADMIN SECURITY FUNCTIONS =================
+        function checkAdminAccess() {
+            if(isAuthenticated) {
+                switchView('admin');
+            } else {
+                document.getElementById('loginModal').classList.remove('hidden');
+                document.getElementById('loginModal').classList.add('flex');
+            }
+        }
+        function closeLoginModal() {
+            document.getElementById('loginModal').classList.remove('flex');
+            document.getElementById('loginModal').classList.add('hidden');
+        }
+        function handleLogin(e) {
+            e.preventDefault();
+            const inputPw = document.getElementById('adminPwInput').value;
+            if(inputPw === currentAdminPassword) {
+                isAuthenticated = true;
+                closeLoginModal();
+                document.getElementById('adminPwInput').value = '';
+                switchView('admin');
+                showToast("লগিন সফল হয়েছে!");
+            } else {
+                alert("ভুল পাসওয়ার্ড! দয়া করে আবার চেষ্টা করুন।");
+            }
+        }
+        function openChangePasswordModal() {
+            document.getElementById('changePasswordModal').classList.remove('hidden');
+            document.getElementById('changePasswordModal').classList.add('flex');
+        }
+        function closeChangePasswordModal() {
+            document.getElementById('changePasswordModal').classList.remove('flex');
+            document.getElementById('changePasswordModal').classList.add('hidden');
+            document.getElementById('newAdminPwInput').value = '';
+        }
+        function handleChangePassword(e) {
+            e.preventDefault();
+            const newPw = document.getElementById('newAdminPwInput').value.trim();
+            if(newPw.length < 4) {
+                alert("পাসওয়ার্ড অন্তত ৪ অক্ষরের হতে হবে!");
+                return;
+            }
+            db.ref('appState/config/adminPassword').set(newPw);
+            currentAdminPassword = newPw;
+            closeChangePasswordModal();
+            showToast("পাসওয়ার্ড সফলভাবে পরিবর্তন করা হয়েছে!");
+        }
+
+        // ================= IMAGE COMPRESSION LOGIC (1:1 Ratio for Prompts) =================
+        const compressImage = (file, maxWidth, maxHeight, quality, forceSquare = false) => {
             return new Promise((resolve, reject) => {
                 const reader = new FileReader();
                 reader.readAsDataURL(file);
@@ -388,24 +481,27 @@
                         const canvas = document.createElement('canvas');
                         let width = img.width;
                         let height = img.height;
-
-                        if (width > height) {
-                            if (width > maxWidth) {
-                                height = Math.round(height * (maxWidth / width));
-                                width = maxWidth;
-                            }
+                        
+                        if (forceSquare) {
+                            // Crop logic for 1:1 square
+                            const size = Math.min(width, height);
+                            const startX = (width - size) / 2;
+                            const startY = (height - size) / 2;
+                            canvas.width = maxWidth;
+                            canvas.height = maxHeight; // maxWidth = maxHeight here
+                            const ctx = canvas.getContext('2d');
+                            ctx.drawImage(img, startX, startY, size, size, 0, 0, maxWidth, maxHeight);
                         } else {
-                            if (height > maxHeight) {
-                                width = Math.round(width * (maxHeight / height));
-                                height = maxHeight;
+                            // Normal scaling
+                            if (width > height) {
+                                if (width > maxWidth) { height = Math.round(height * (maxWidth / width)); width = maxWidth; }
+                            } else {
+                                if (height > maxHeight) { width = Math.round(width * (maxHeight / height)); height = maxHeight; }
                             }
+                            canvas.width = width; canvas.height = height;
+                            const ctx = canvas.getContext('2d');
+                            ctx.drawImage(img, 0, 0, width, height);
                         }
-
-                        canvas.width = width;
-                        canvas.height = height;
-                        const ctx = canvas.getContext('2d');
-                        ctx.drawImage(img, 0, 0, width, height);
-                        // Returns a highly compressed Base64 string directly!
                         resolve(canvas.toDataURL('image/jpeg', quality));
                     };
                     img.onerror = (error) => reject(error);
@@ -414,10 +510,9 @@
             });
         };
 
-        // ================= DATA LOADING (Realtime DB) =================
+        // ================= DATA LOADING =================
         async function loadData() {
             try {
-                // Load Settings
                 const configRef = db.ref('appState/config');
                 configRef.on('value', (snapshot) => {
                     if (snapshot.exists()) {
@@ -425,21 +520,18 @@
                         categories = data.categories || initialCategories;
                         siteSettings = data.siteSettings || initialSiteSettings;
                         heroSettings = data.heroSettings || initialHeroSettings;
+                        currentAdminPassword = data.adminPassword || "admin";
                     } else {
                         categories = initialCategories;
                         siteSettings = initialSiteSettings;
                         heroSettings = initialHeroSettings;
-                        configRef.set({ categories, siteSettings, heroSettings });
+                        configRef.set({ categories, siteSettings, heroSettings, adminPassword: "admin" });
                     }
-                    applySiteSettings();
-                    applyHeroSettings();
-                    renderCategories();
-                    renderAdminCategories();
-                    updateCategoryDropdown();
+                    applySiteSettings(); applyHeroSettings();
+                    renderCategories(); renderAdminCategories(); updateCategoryDropdown();
                     renderCategorySections();
                 });
 
-                // Load Prompts
                 const promptsRef = db.ref('prompts');
                 promptsRef.on('value', (snapshot) => {
                     prompts = [];
@@ -447,16 +539,16 @@
                         snapshot.forEach((childSnapshot) => {
                             prompts.push({ id: childSnapshot.key, ...childSnapshot.val() });
                         });
-                        // Sort by timestamp descending
                         prompts.sort((a, b) => b.timestamp - a.timestamp);
+                    } else {
+                        // Insert 45 generated demos if database is completely empty
+                        generatedPrompts.forEach(p => db.ref('prompts').push(p));
                     }
                     renderCategorySections();
                     renderAdminPrompts();
                 });
-
             } catch (error) {
-                console.error("Firebase ডেটা লোড করতে সমস্যা:", error);
-                alert("ডাটাবেস কানেকশন ফেইল করেছে। দয়া করে Firebase Config ও Rules চেক করুন।");
+                console.error("Firebase Error:", error);
             }
         }
 
@@ -465,7 +557,6 @@
             document.getElementById('homeView').classList.add('hidden');
             document.getElementById('adminView').classList.add('hidden');
             document.getElementById('detailsView').classList.add('hidden');
-            
             const adminBtn = document.getElementById('floatingAdminBtn');
 
             if(view === 'home') {
@@ -492,31 +583,21 @@
         function applyHeroSettings() {
             document.getElementById('heroMainTitle').innerHTML = heroSettings.mainTitle;
             document.getElementById('marqueeTextContainer').innerHTML = heroSettings.marqueeText;
-            
-            const slider = document.getElementById('heroSlider');
-            slider.innerHTML = `
+            document.getElementById('heroSlider').innerHTML = `
                 <img src="${heroSettings.img1}" class="w-full h-full object-cover flex-shrink-0" alt="Slide 1">
                 <img src="${heroSettings.img2}" class="w-full h-full object-cover flex-shrink-0" alt="Slide 2">
                 <img src="${heroSettings.img3}" class="w-full h-full object-cover flex-shrink-0" alt="Slide 3">
             `;
-            currentSlide = 0;
-            updateSlider();
+            currentSlide = 0; updateSlider();
         }
 
         function renderCategories() {
-            const container = document.getElementById('categoryFilterContainer');
-            container.innerHTML = categories.map(cat => `
-                <button onclick="filterCategory('${cat}')" class="px-4 py-2 rounded-xl text-xs sm:text-sm font-medium whitespace-nowrap transition-all ${activeCategory === cat ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30' : 'bg-slate-900 text-slate-300 hover:bg-slate-800 border border-slate-800'}">
-                    ${cat}
-                </button>
+            document.getElementById('categoryFilterContainer').innerHTML = categories.map(cat => `
+                <button onclick="filterCategory('${cat}')" class="px-4 py-2 rounded-xl text-xs sm:text-sm font-medium whitespace-nowrap transition-all ${activeCategory === cat ? 'bg-indigo-600 text-white shadow-md shadow-indigo-600/30' : 'bg-slate-900 text-slate-300 hover:bg-slate-800 border border-slate-800'}">${cat}</button>
             `).join('');
         }
 
-        function filterCategory(cat) {
-            activeCategory = cat;
-            renderCategories();
-            renderCategorySections();
-        }
+        function filterCategory(cat) { activeCategory = cat; renderCategories(); renderCategorySections(); }
 
         function renderCategorySections() {
             const container = document.getElementById('categorySectionsContainer');
@@ -527,15 +608,11 @@
                 let catPrompts = prompts.filter(p => p.category.toUpperCase() === cat.toUpperCase());
                 if (activeCategory === "ALL" && catPrompts.length === 0) return;
 
-                htmlContent += `
-                    <div class="space-y-4">
+                htmlContent += `<div class="space-y-4">
                         <div class="flex items-center justify-between border-b border-slate-800 pb-2">
-                            <h3 class="text-xl font-bold text-white flex items-center">
-                                <i class="fa-solid fa-fire mr-2 text-indigo-500"></i> ${cat}
-                            </h3>
+                            <h3 class="text-xl font-bold text-white flex items-center"><i class="fa-solid fa-fire mr-2 text-indigo-500"></i> ${cat}</h3>
                             <span class="text-xs text-slate-400 font-medium">${catPrompts.length} items</span>
-                        </div>
-                `;
+                        </div>`;
 
                 if(catPrompts.length === 0) {
                     htmlContent += `<div class="text-sm text-slate-500 py-4">এই ক্যাটাগরিতে কোনো প্রম্পট নেই।</div>`;
@@ -544,23 +621,17 @@
                     htmlContent += catPrompts.map((p) => `
                         <div class="viral-card bg-slate-900 border border-slate-800 rounded-3xl p-4 flex flex-col justify-between space-y-4 shadow-xl">
                             <div class="grid grid-cols-3 gap-2">
-                                <div class="relative group overflow-hidden rounded-2xl bg-slate-950 aspect-[3/4]">
+                                <div class="relative group overflow-hidden rounded-2xl bg-slate-950 aspect-square">
                                     <img src="${p.img1}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" alt="img1">
-                                    <div class="absolute bottom-1 left-1 bg-black/75 backdrop-blur-md px-1.5 py-0.5 rounded-md text-[9px] font-semibold text-white flex items-center space-x-1">
-                                        <i class="fa-solid fa-bolt text-[7px] text-amber-400"></i><span>${p.view1}</span>
-                                    </div>
+                                    <div class="absolute bottom-1 left-1 bg-black/75 px-1.5 py-0.5 rounded-md text-[9px] font-semibold text-white flex items-center space-x-1"><i class="fa-solid fa-bolt text-[7px] text-amber-400"></i><span>${p.view1}</span></div>
                                 </div>
-                                <div class="relative group overflow-hidden rounded-2xl bg-slate-950 aspect-[3/4]">
+                                <div class="relative group overflow-hidden rounded-2xl bg-slate-950 aspect-square">
                                     <img src="${p.img2}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" alt="img2">
-                                    <div class="absolute bottom-1 left-1 bg-black/75 backdrop-blur-md px-1.5 py-0.5 rounded-md text-[9px] font-semibold text-white flex items-center space-x-1">
-                                        <i class="fa-solid fa-play text-[7px] text-indigo-400"></i><span>${p.view2}</span>
-                                    </div>
+                                    <div class="absolute bottom-1 left-1 bg-black/75 px-1.5 py-0.5 rounded-md text-[9px] font-semibold text-white flex items-center space-x-1"><i class="fa-solid fa-play text-[7px] text-indigo-400"></i><span>${p.view2}</span></div>
                                 </div>
-                                <div class="relative group overflow-hidden rounded-2xl bg-slate-950 aspect-[3/4]">
+                                <div class="relative group overflow-hidden rounded-2xl bg-slate-950 aspect-square">
                                     <img src="${p.img3}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" alt="img3">
-                                    <div class="absolute bottom-1 left-1 bg-black/75 backdrop-blur-md px-1.5 py-0.5 rounded-md text-[9px] font-semibold text-white flex items-center space-x-1">
-                                        <i class="fa-solid fa-chart-simple text-[7px] text-emerald-400"></i><span>${p.view3}</span>
-                                    </div>
+                                    <div class="absolute bottom-1 left-1 bg-black/75 px-1.5 py-0.5 rounded-md text-[9px] font-semibold text-white flex items-center space-x-1"><i class="fa-solid fa-chart-simple text-[7px] text-emerald-400"></i><span>${p.view3}</span></div>
                                 </div>
                             </div>
                             <div class="space-y-2">
@@ -570,70 +641,41 @@
                                 </div>
                                 <h3 class="font-bold text-sm text-white line-clamp-2 tracking-tight">${p.title}</h3>
                             </div>
-                            <button onclick='openDetailsPage(${JSON.stringify(p).replace(/'/g, "&#39;")})' class="w-full py-2.5 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-semibold shadow-lg shadow-indigo-600/30 transition-all flex items-center justify-center space-x-2">
-                                <span>Open prompt</span>
-                            </button>
+                            <button onclick='openDetailsPage(${JSON.stringify(p).replace(/'/g, "&#39;")})' class="w-full py-2.5 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-semibold shadow-lg shadow-indigo-600/30 transition-all">Open prompt</button>
                         </div>
                     `).join('');
                     htmlContent += `</div>`;
                 }
                 htmlContent += `</div>`;
             });
-
-            if(htmlContent === "") {
-                htmlContent = `<div class="text-center py-16 text-slate-500">কোনো প্রম্পট পাওয়া যায়নি!</div>`;
-            }
+            if(htmlContent === "") htmlContent = `<div class="text-center py-16 text-slate-500">কোনো প্রম্পট পাওয়া যায়নি!</div>`;
             container.innerHTML = htmlContent;
         }
 
-        // ================= ADMIN FUNCTIONS =================
+        // ================= ADMIN & FORMS =================
         function renderAdminCategories() {
-            const list = document.getElementById('adminCategoryList');
-            list.innerHTML = categories.map((cat, idx) => `
+            document.getElementById('adminCategoryList').innerHTML = categories.map((cat, idx) => `
                 <div class="flex items-center justify-between bg-slate-950 p-3 rounded-xl border border-slate-800 text-sm">
                     <span class="font-medium text-slate-200">${cat}</span>
                     ${idx !== 0 ? `<button onclick="deleteCategory(${idx})" class="text-rose-400 hover:text-rose-300 p-1"><i class="fa-solid fa-trash"></i></button>` : '<span class="text-xs text-slate-500">Default</span>'}
                 </div>
             `).join('');
         }
-
-        function addCategory() {
-            const input = document.getElementById('newCategoryInput');
-            const val = input.value.trim().toUpperCase();
-            if(val && !categories.includes(val)) {
-                categories.push(val);
-                db.ref('appState/config/categories').set(categories);
-                input.value = "";
-            }
-        }
-
-        function deleteCategory(idx) {
-            if(confirm("আপনি কি এই ক্যাটাগরি ডিলিট করতে চান?")) {
-                categories.splice(idx, 1);
-                db.ref('appState/config/categories').set(categories);
-            }
-        }
-
-        function updateCategoryDropdown() {
-            const select = document.getElementById('promptCategory');
-            select.innerHTML = categories.filter(c => c !== "ALL").map(c => `<option value="${c}">${c}</option>`).join('');
-        }
+        function addCategory() { const val = document.getElementById('newCategoryInput').value.trim().toUpperCase(); if(val && !categories.includes(val)) { categories.push(val); db.ref('appState/config/categories').set(categories); document.getElementById('newCategoryInput').value = ""; } }
+        function deleteCategory(idx) { if(confirm("ডিলিট করতে চান?")) { categories.splice(idx, 1); db.ref('appState/config/categories').set(categories); } }
+        function updateCategoryDropdown() { document.getElementById('promptCategory').innerHTML = categories.filter(c => c !== "ALL").map(c => `<option value="${c}">${c}</option>`).join(''); }
 
         function renderAdminPrompts() {
-            const list = document.getElementById('adminPromptsList');
             document.getElementById('totalPromptsCount').innerText = prompts.length;
-            if(prompts.length === 0) {
-                list.innerHTML = `<p class="text-center text-slate-500 py-8">কোনো প্রম্পট নেই।</p>`;
-                return;
-            }
+            const list = document.getElementById('adminPromptsList');
+            if(prompts.length === 0) { list.innerHTML = `<p class="text-center text-slate-500 py-8">কোনো প্রম্পট নেই।</p>`; return; }
             list.innerHTML = prompts.map((p, idx) => `
                 <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between bg-slate-950 p-4 rounded-xl border border-slate-800 gap-4">
                     <div class="flex items-center space-x-3">
-                        <img src="${p.img1}" class="w-12 h-14 object-cover rounded-lg bg-slate-900" alt="thumb">
+                        <img src="${p.img1}" class="w-12 h-12 object-cover rounded-lg bg-slate-900" alt="thumb">
                         <div>
                             <span class="text-[10px] font-bold text-indigo-400 px-2 py-0.5 rounded bg-indigo-500/10">${p.category}</span>
                             <h4 class="font-bold text-sm text-white mt-1 line-clamp-1">${p.title}</h4>
-                            <p class="text-xs text-slate-400 mt-0.5">Prompts: ${p.promptsList ? p.promptsList.length : 1}</p>
                         </div>
                     </div>
                     <div class="flex items-center space-x-2 w-full sm:w-auto justify-end">
@@ -644,20 +686,12 @@
             `).join('');
         }
 
-        async function deletePrompt(promptId) {
-            if(confirm("আপনি কি এই প্রম্পটটি ডিলিট করতে চান?")) {
-                await db.ref('prompts/' + promptId).remove();
-            }
-        }
+        async function deletePrompt(promptId) { if(confirm("ডিলিট করতে চান?")) await db.ref('prompts/' + promptId).remove(); }
 
-        // ================= FORM SUBMISSIONS =================
         async function handlePromptSubmit(e) {
             e.preventDefault();
             const editIndex = parseInt(document.getElementById('editIndex').value);
-            const saveBtn = document.getElementById('saveBtn');
-            saveBtn.disabled = true;
-            saveBtn.innerText = "সংরক্ষণ হচ্ছে...";
-
+            const saveBtn = document.getElementById('saveBtn'); saveBtn.disabled = true; saveBtn.innerText = "সংরক্ষণ হচ্ছে...";
             const title = document.getElementById('promptTitle').value;
             const category = document.getElementById('promptCategory').value;
             const badge = document.getElementById('promptBadge').value;
@@ -665,219 +699,88 @@
             const view2 = document.getElementById('viewCount2').value || "20M";
             const view3 = document.getElementById('viewCount3').value || "30M";
 
-            const nameInputs = document.querySelectorAll('.prompt-name-input');
-            const textInputs = document.querySelectorAll('.prompt-text-input');
             let promptsList = [];
-            for(let i = 0; i < nameInputs.length; i++) {
-                if(textInputs[i].value.trim() !== "") {
-                    promptsList.push({ name: nameInputs[i].value.trim(), text: textInputs[i].value.trim() });
-                }
-            }
+            const names = document.querySelectorAll('.prompt-name-input');
+            const texts = document.querySelectorAll('.prompt-text-input');
+            for(let i=0; i<names.length; i++) if(texts[i].value.trim()) promptsList.push({ name: names[i].value.trim(), text: texts[i].value.trim() });
+            
+            if(promptsList.length === 0) { alert("প্রম্পট যোগ করুন!"); saveBtn.disabled = false; saveBtn.innerText = "সংরক্ষণ করুন"; return; }
 
-            if(promptsList.length === 0) {
-                alert("দয়া করে কমপক্ষে একটি প্রম্পট যোগ করুন!");
-                saveBtn.disabled = false; saveBtn.innerText = "সংরক্ষণ করুন"; return;
-            }
-
-            const file1 = document.getElementById('imgFile1').files[0];
-            const file2 = document.getElementById('imgFile2').files[0];
-            const file3 = document.getElementById('imgFile3').files[0];
-
-            let img1 = editIndex !== -1 ? prompts[editIndex].img1 : "";
-            let img2 = editIndex !== -1 ? prompts[editIndex].img2 : "";
-            let img3 = editIndex !== -1 ? prompts[editIndex].img3 : "";
+            const f1 = document.getElementById('imgFile1').files[0]; const f2 = document.getElementById('imgFile2').files[0]; const f3 = document.getElementById('imgFile3').files[0];
+            let img1 = editIndex !== -1 ? prompts[editIndex].img1 : ""; let img2 = editIndex !== -1 ? prompts[editIndex].img2 : ""; let img3 = editIndex !== -1 ? prompts[editIndex].img3 : "";
 
             try {
-                showToast("ছবি প্রসেসিং হচ্ছে, অপেক্ষা করুন...");
-                // Saving Base64 strings directly!
-                if (file1) img1 = await compressImage(file1, 400, 533, 0.4);
-                if (file2) img2 = await compressImage(file2, 400, 533, 0.4);
-                if (file3) img3 = await compressImage(file3, 400, 533, 0.4);
+                showToast("ছবি প্রসেসিং হচ্ছে...");
+                // Force square (400x400) logic for prompts
+                if (f1) img1 = await compressImage(f1, 400, 400, 0.4, true);
+                if (f2) img2 = await compressImage(f2, 400, 400, 0.4, true);
+                if (f3) img3 = await compressImage(f3, 400, 400, 0.4, true);
 
                 const promptObj = { title, category, badge, img1, view1, img2, view2, img3, view3, promptsList, content: promptsList[0].text, timestamp: Date.now() };
-
-                if(editIndex === -1) {
-                    await db.ref('prompts').push(promptObj);
-                } else {
-                    await db.ref('prompts/' + prompts[editIndex].id).set(promptObj);
-                }
-
-                closePromptModal();
-                showToast("সফলভাবে সংরক্ষণ করা হয়েছে!");
-            } catch (err) {
-                console.error(err);
-                alert("ফায়ারবেসে সেভ করতে সমস্যা হয়েছে!");
-            } finally {
-                saveBtn.innerText = "সংরক্ষণ করুন";
-                saveBtn.disabled = false;
-            }
+                if(editIndex === -1) await db.ref('prompts').push(promptObj);
+                else await db.ref('prompts/' + prompts[editIndex].id).set(promptObj);
+                
+                closePromptModal(); showToast("সংরক্ষণ করা হয়েছে!");
+            } catch (err) { console.error(err); alert("সমস্যা হয়েছে!"); }
+            finally { saveBtn.innerText = "সংরক্ষণ করুন"; saveBtn.disabled = false; }
         }
 
         async function handleHeroSettingsSubmit(e) {
             e.preventDefault();
-            const btn = document.getElementById('saveHeroBtn');
-            btn.disabled = true; btn.innerText = "সেভ হচ্ছে...";
-
+            const btn = document.getElementById('saveHeroBtn'); btn.disabled = true; btn.innerText = "সেভ হচ্ছে...";
             try {
-                heroSettings.mainTitle = document.getElementById('hsMainTitle').value;
-                heroSettings.marqueeText = document.getElementById('hsMarqueeText').value;
-                
-                const hFile1 = document.getElementById('heroImgFile1').files[0];
-                const hFile2 = document.getElementById('heroImgFile2').files[0];
-                const hFile3 = document.getElementById('heroImgFile3').files[0];
-
+                heroSettings.mainTitle = document.getElementById('hsMainTitle').value; heroSettings.marqueeText = document.getElementById('hsMarqueeText').value;
+                const f1 = document.getElementById('heroImgFile1').files[0]; const f2 = document.getElementById('heroImgFile2').files[0]; const f3 = document.getElementById('heroImgFile3').files[0];
                 showToast("সেটিংস প্রসেস হচ্ছে...");
-                // Save Base64 directly
-                if (hFile1) heroSettings.img1 = await compressImage(hFile1, 800, 450, 0.5);
-                if (hFile2) heroSettings.img2 = await compressImage(hFile2, 800, 450, 0.5);
-                if (hFile3) heroSettings.img3 = await compressImage(hFile3, 800, 450, 0.5);
-
+                if (f1) heroSettings.img1 = await compressImage(f1, 800, 450, 0.5);
+                if (f2) heroSettings.img2 = await compressImage(f2, 800, 450, 0.5);
+                if (f3) heroSettings.img3 = await compressImage(f3, 800, 450, 0.5);
                 await db.ref('appState/config/heroSettings').set(heroSettings);
-                closeHeroSettingsModal();
-                showToast("হিরো সেকশন সফলভাবে আপডেট হয়েছে!");
-            } catch (err) {
-                console.error(err);
-                alert("হিরো সেটিংস সেভ করতে সমস্যা হয়েছে!");
-            } finally {
-                btn.innerText = "সেভ করুন"; btn.disabled = false;
-            }
+                closeHeroSettingsModal(); showToast("আপডেট হয়েছে!");
+            } catch (err) { alert("সমস্যা হয়েছে!"); }
+            finally { btn.innerText = "সেভ করুন"; btn.disabled = false; }
         }
 
         async function handleSiteSettingsSubmit(e) {
             e.preventDefault();
-            const btn = document.getElementById('saveSiteBtn');
-            btn.disabled = true; btn.innerText = "সেভ হচ্ছে...";
-
+            const btn = document.getElementById('saveSiteBtn'); btn.disabled = true; btn.innerText = "সেভ হচ্ছে...";
             try {
-                siteSettings.siteName = document.getElementById('ssSiteName').value;
-                siteSettings.subtitle = document.getElementById('ssSubtitle').value;
-                
-                const logoFile = document.getElementById('siteLogoFile').files[0];
-                if (logoFile) {
-                    showToast("লোগো প্রসেস হচ্ছে...");
-                    siteSettings.logoUrl = await compressImage(logoFile, 200, 200, 0.7);
-                }
-                
+                siteSettings.siteName = document.getElementById('ssSiteName').value; siteSettings.subtitle = document.getElementById('ssSubtitle').value;
+                const f = document.getElementById('siteLogoFile').files[0];
+                if (f) { showToast("লোগো প্রসেস হচ্ছে..."); siteSettings.logoUrl = await compressImage(f, 200, 200, 0.7, true); }
                 await db.ref('appState/config/siteSettings').set(siteSettings);
-                closeSiteSettingsModal();
-                showToast("সাইট সেটিংস সফলভাবে আপডেট হয়েছে!");
-            } catch (err) {
-                console.error(err);
-                alert("সাইট সেটিংস সেভ করতে সমস্যা হয়েছে!");
-            } finally {
-                btn.innerText = "সেভ করুন"; btn.disabled = false;
-            }
+                closeSiteSettingsModal(); showToast("আপডেট হয়েছে!");
+            } catch (err) { alert("সমস্যা হয়েছে!"); }
+            finally { btn.innerText = "সেভ করুন"; btn.disabled = false; }
         }
 
-        // ================= MODAL CONTROLS =================
-        function openPromptModal() {
-            document.getElementById('modalTitle').innerText = "নতুন প্রম্পট যোগ করুন";
-            document.getElementById('editIndex').value = "-1";
-            document.getElementById('promptForm').reset();
-            document.getElementById('promptsFieldsContainer').innerHTML = "";
-            addPromptField("Main Prompt", "");
-            document.getElementById('promptModal').classList.remove('hidden');
-            document.getElementById('promptModal').classList.add('flex');
-        }
-        function closePromptModal() { document.getElementById('promptModal').classList.remove('flex'); document.getElementById('promptModal').classList.add('hidden'); }
+        // Modal Toggles...
+        function openPromptModal() { document.getElementById('modalTitle').innerText = "নতুন প্রম্পট"; document.getElementById('editIndex').value = "-1"; document.getElementById('promptForm').reset(); document.getElementById('promptsFieldsContainer').innerHTML = ""; addPromptField("Main Prompt", ""); document.getElementById('promptModal').classList.replace('hidden','flex'); }
+        function closePromptModal() { document.getElementById('promptModal').classList.replace('flex','hidden'); }
+        function editPrompt(idx) { const p = prompts[idx]; document.getElementById('modalTitle').innerText = "প্রম্পট এডিট"; document.getElementById('editIndex').value = idx; document.getElementById('promptTitle').value = p.title; document.getElementById('promptCategory').value = p.category; document.getElementById('promptBadge').value = p.badge; document.getElementById('viewCount1').value = p.view1; document.getElementById('viewCount2').value = p.view2; document.getElementById('viewCount3').value = p.view3; document.getElementById('promptsFieldsContainer').innerHTML = ""; let list = p.promptsList || [{ name: "Main Prompt", text: p.content || "" }]; list.forEach(item => addPromptField(item.name, item.text)); document.getElementById('promptModal').classList.replace('hidden','flex'); }
+        function openHeroSettingsModal() { document.getElementById('hsMainTitle').value = heroSettings.mainTitle; document.getElementById('hsMarqueeText').value = heroSettings.marqueeText; document.getElementById('heroSettingsForm').reset(); document.getElementById('heroSettingsModal').classList.replace('hidden','flex'); }
+        function closeHeroSettingsModal() { document.getElementById('heroSettingsModal').classList.replace('flex','hidden'); }
+        function openSiteSettingsModal() { document.getElementById('ssSiteName').value = siteSettings.siteName; document.getElementById('ssSubtitle').value = siteSettings.subtitle; document.getElementById('siteSettingsForm').reset(); document.getElementById('siteSettingsModal').classList.replace('hidden','flex'); }
+        function closeSiteSettingsModal() { document.getElementById('siteSettingsModal').classList.replace('flex','hidden'); }
+        function addPromptField(name = '', text = '') { const id = 'row_' + Date.now(); const div = document.createElement('div'); div.className = "flex flex-col sm:flex-row gap-2 bg-slate-900 p-3 rounded-xl border border-slate-800 relative"; div.id = id; div.innerHTML = `<div class="flex-1 space-y-2"><input type="text" placeholder="নাম..." value="${name}" class="prompt-name-input w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-xs text-white focus:border-indigo-500" required><textarea rows="2" placeholder="টেক্সট..." class="prompt-text-input w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-xs text-white focus:border-indigo-500" required>${text}</textarea></div><button type="button" onclick="document.getElementById('${id}').remove()" class="px-3 py-2 bg-rose-500/20 text-rose-400 hover:bg-rose-500/30 text-xs rounded-lg transition-all"><i class="fa-solid fa-trash"></i></button>`; document.getElementById('promptsFieldsContainer').appendChild(div); }
 
-        function editPrompt(idx) {
-            const p = prompts[idx];
-            document.getElementById('modalTitle').innerText = "প্রম্পট এডিট করুন";
-            document.getElementById('editIndex').value = idx;
-            document.getElementById('promptTitle').value = p.title;
-            document.getElementById('promptCategory').value = p.category;
-            document.getElementById('promptBadge').value = p.badge;
-            document.getElementById('viewCount1').value = p.view1;
-            document.getElementById('viewCount2').value = p.view2;
-            document.getElementById('viewCount3').value = p.view3;
-            const container = document.getElementById('promptsFieldsContainer');
-            container.innerHTML = "";
-            let list = p.promptsList && p.promptsList.length > 0 ? p.promptsList : [{ name: "Main Prompt", text: p.content || "" }];
-            list.forEach(item => addPromptField(item.name, item.text));
-            document.getElementById('promptModal').classList.remove('hidden');
-            document.getElementById('promptModal').classList.add('flex');
-        }
-
-        function openHeroSettingsModal() {
-            document.getElementById('hsMainTitle').value = heroSettings.mainTitle;
-            document.getElementById('hsMarqueeText').value = heroSettings.marqueeText;
-            document.getElementById('heroSettingsForm').reset();
-            document.getElementById('heroSettingsModal').classList.remove('hidden');
-            document.getElementById('heroSettingsModal').classList.add('flex');
-        }
-        function closeHeroSettingsModal() { document.getElementById('heroSettingsModal').classList.remove('flex'); document.getElementById('heroSettingsModal').classList.add('hidden'); }
-
-        function openSiteSettingsModal() {
-            document.getElementById('ssSiteName').value = siteSettings.siteName;
-            document.getElementById('ssSubtitle').value = siteSettings.subtitle;
-            document.getElementById('siteSettingsForm').reset();
-            document.getElementById('siteSettingsModal').classList.remove('hidden');
-            document.getElementById('siteSettingsModal').classList.add('flex');
-        }
-        function closeSiteSettingsModal() { document.getElementById('siteSettingsModal').classList.remove('flex'); document.getElementById('siteSettingsModal').classList.add('hidden'); }
-
-        function addPromptField(name = '', text = '') {
-            const container = document.getElementById('promptsFieldsContainer');
-            const rowId = 'promptRow_' + Date.now();
-            const div = document.createElement('div');
-            div.className = "flex flex-col sm:flex-row gap-2 bg-slate-900 p-3 rounded-xl border border-slate-800 relative";
-            div.id = rowId;
-            div.innerHTML = `
-                <div class="flex-1 space-y-2">
-                    <input type="text" placeholder="প্রম্পটের নাম..." value="${name}" class="prompt-name-input w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-indigo-500" required>
-                    <textarea rows="2" placeholder="প্রম্পট টেক্সট..." class="prompt-text-input w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-xs text-white focus:outline-none focus:border-indigo-500" required>${text}</textarea>
-                </div>
-                <div class="flex items-center justify-end sm:justify-center">
-                    <button type="button" onclick="document.getElementById('${rowId}').remove()" class="px-3 py-2 bg-rose-500/20 text-rose-400 hover:bg-rose-500/30 text-xs rounded-lg transition-all"><i class="fa-solid fa-trash"></i></button>
-                </div>
-            `;
-            container.appendChild(div);
-        }
-
-        // ================= OTHERS =================
         function openDetailsPage(p) {
-            document.getElementById('detailCategoryBadge').innerText = p.category;
-            document.getElementById('detailBadge').innerText = p.badge;
-            document.getElementById('detailTitle').innerText = p.title;
-            const promptsContainer = document.getElementById('detailPromptsList');
-            let items = p.promptsList && p.promptsList.length > 0 ? p.promptsList : [{ name: "Main Prompt", text: p.content || "" }];
-            promptsContainer.innerHTML = items.map((item, index) => `
-                <div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl space-y-3 shadow-lg">
-                    <span class="text-xs font-bold text-indigo-400"><i class="fa-solid fa-code mr-1"></i> ${item.name || ('Prompt ' + (index + 1))}</span>
-                    <p class="text-sm text-slate-300 whitespace-pre-wrap select-all bg-slate-950 p-4 rounded-xl border border-slate-800">${item.text}</p>
-                    <button onclick='copySinglePrompt(${JSON.stringify(item.text).replace(/'/g, "&#39;")})' class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-medium rounded-xl transition-all"><i class="fa-regular fa-copy mr-1.5"></i> কপি করুন</button>
-                </div>
-            `).join('');
-            document.getElementById('detailImagesList').innerHTML = [
-                { url: p.img1, view: p.view1 }, { url: p.img2, view: p.view2 }, { url: p.img3, view: p.view3 }
-            ].map((img, i) => `
-                <div class="relative rounded-2xl bg-slate-900 border border-slate-800 aspect-[3/4] shadow-lg overflow-hidden group">
-                    <img src="${img.url}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" alt="Thumb">
-                    <div class="absolute bottom-3 left-3 bg-black/80 px-2.5 py-1 rounded-lg text-xs font-semibold text-white border border-slate-700 flex items-center"><i class="fa-solid fa-bolt text-amber-400 mr-1.5"></i>Views: ${img.view}</div>
-                </div>
-            `).join('');
+            document.getElementById('detailCategoryBadge').innerText = p.category; document.getElementById('detailBadge').innerText = p.badge; document.getElementById('detailTitle').innerText = p.title;
+            let items = p.promptsList || [{ name: "Main Prompt", text: p.content || "" }];
+            document.getElementById('detailPromptsList').innerHTML = items.map((item, index) => `<div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl space-y-3 shadow-lg"><span class="text-xs font-bold text-indigo-400"><i class="fa-solid fa-code mr-1"></i> ${item.name || 'Prompt '+(index+1)}</span><p class="text-sm text-slate-300 whitespace-pre-wrap select-all bg-slate-950 p-4 rounded-xl border border-slate-800">${item.text}</p><button onclick='copySinglePrompt(${JSON.stringify(item.text).replace(/'/g, "&#39;")})' class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-medium rounded-xl transition-all"><i class="fa-regular fa-copy mr-1.5"></i> কপি করুন</button></div>`).join('');
+            document.getElementById('detailImagesList').innerHTML = [{ url: p.img1, view: p.view1 }, { url: p.img2, view: p.view2 }, { url: p.img3, view: p.view3 }].map(img => `<div class="relative rounded-2xl bg-slate-900 border border-slate-800 aspect-square shadow-lg overflow-hidden group"><img src="${img.url}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" alt="Thumb"><div class="absolute bottom-3 left-3 bg-black/80 px-2.5 py-1 rounded-lg text-xs font-semibold text-white border border-slate-700 flex items-center"><i class="fa-solid fa-bolt text-amber-400 mr-1.5"></i>Views: ${img.view}</div></div>`).join('');
             switchView('details');
         }
 
         function copySinglePrompt(text) { navigator.clipboard.writeText(text); showToast("কপি করা হয়েছে!"); }
-        
-        function showToast(message) {
-            const container = document.getElementById('toastContainer');
-            const toast = document.createElement('div');
-            toast.className = "bg-indigo-600 text-white text-xs px-4 py-3 rounded-xl shadow-2xl flex items-center space-x-2 border border-indigo-400/30 animate-toast";
-            toast.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-300"></i><span>${message}</span>`;
-            container.appendChild(toast);
-            setTimeout(() => { toast.style.opacity = '0'; toast.style.transition = 'opacity 0.3s ease'; setTimeout(() => toast.remove(), 300); }, 2500);
-        }
+        function showToast(message) { const c = document.getElementById('toastContainer'); const t = document.createElement('div'); t.className = "bg-indigo-600 text-white text-xs px-4 py-3 rounded-xl shadow-2xl flex items-center space-x-2 border border-indigo-400/30 animate-toast"; t.innerHTML = `<i class="fa-solid fa-circle-check text-emerald-300"></i><span>${message}</span>`; c.appendChild(t); setTimeout(() => { t.style.opacity = '0'; t.style.transition = 'opacity 0.3s ease'; setTimeout(() => t.remove(), 300); }, 2500); }
 
         let currentSlide = 0;
-        function updateSlider() { const slider = document.getElementById('heroSlider'); slider.style.transform = `translateX(-${currentSlide * 100}%)`; }
+        function updateSlider() { document.getElementById('heroSlider').style.transform = `translateX(-${currentSlide * 100}%)`; }
         function nextSlide() { currentSlide = (currentSlide + 1) % 3; updateSlider(); }
         function prevSlide() { currentSlide = (currentSlide - 1 + 3) % 3; updateSlider(); }
         setInterval(nextSlide, 5000);
 
-        // STARTUP
         loadData();
     </script>
 </body>
