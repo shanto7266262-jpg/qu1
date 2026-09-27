@@ -128,7 +128,8 @@
                     <button onclick="handleLogout()" class="px-4 py-2 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 text-sm font-medium transition-all flex items-center">
                         <i class="fa-solid fa-right-from-bracket mr-2"></i> লগআউট
                     </button>
-                    <button onclick="openChangePasswordModal()" class="px-4 py-2 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/30 text-sm font-medium transition-all flex items-center">
+                    <!-- Password Button (Hidden by default, shown after pressing '0' five times) -->
+                    <button id="passwordChangeBtn" onclick="openChangePasswordModal()" class="hidden px-4 py-2 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/30 text-sm font-medium transition-all items-center">
                         <i class="fa-solid fa-key mr-2"></i> পাসওয়ার্ড
                     </button>
                     <!-- Security Setting Button (Hidden by default, shown after 3 spacebar presses) -->
@@ -472,14 +473,19 @@
             }
         }
 
-        // ================= KEYBOARD SPACEBAR LOGIC (3 Spacebar Presses to show Security Settings) =================
+        // ================= KEYBOARD LOGIC (3 Spacebars for Security Settings, 5 Zeros for Password Button) =================
         let adminPanelSpacebarCount = 0;
         let adminPanelSpacebarTimer;
+        
+        let zeroKeyCount = 0;
+        let zeroKeyTimer;
+
         document.addEventListener('keydown', (e) => {
-            if (e.code === 'Space') {
-                if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') return;
-                
-                if (!document.getElementById('adminView').classList.contains('hidden')) {
+            if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') return;
+            
+            if (!document.getElementById('adminView').classList.contains('hidden')) {
+                // ৩ বার স্পেস চাপলে সিকিউরিটি সেটিং শো করবে
+                if (e.code === 'Space') {
                     adminPanelSpacebarCount++;
                     clearTimeout(adminPanelSpacebarTimer);
                     if (adminPanelSpacebarCount >= 3) {
@@ -492,6 +498,23 @@
                         adminPanelSpacebarCount = 0;
                     } else {
                         adminPanelSpacebarTimer = setTimeout(() => { adminPanelSpacebarCount = 0; }, 2000);
+                    }
+                }
+
+                // ৫ বার জিরো ('0' বা Digit0) চাপলে পাসওয়ার্ড বাটন শো করবে
+                if (e.code === 'Digit0' || e.key === '0') {
+                    zeroKeyCount++;
+                    clearTimeout(zeroKeyTimer);
+                    if (zeroKeyCount >= 5) {
+                        const passBtn = document.getElementById('passwordChangeBtn');
+                        if(passBtn) {
+                            passBtn.classList.remove('hidden');
+                            passBtn.classList.add('flex');
+                            showToast("পাসওয়ার্ড বাটন আনলক হয়েছে!");
+                        }
+                        zeroKeyCount = 0;
+                    } else {
+                        zeroKeyTimer = setTimeout(() => { zeroKeyCount = 0; }, 2000);
                     }
                 }
             }
@@ -638,16 +661,16 @@
             document.getElementById('adminView').classList.add('hidden');
             document.getElementById('detailsView').classList.add('hidden');
             const secBtn = document.getElementById('securitySettingsBtn');
+            const passBtn = document.getElementById('passwordChangeBtn');
 
             if(view === 'home') {
                 document.getElementById('homeView').classList.remove('hidden');
                 renderCategorySections();
             } else if(view === 'admin') {
                 document.getElementById('adminView').classList.remove('hidden');
-                if(secBtn) {
-                    secBtn.classList.remove('flex');
-                    secBtn.classList.add('hidden');
-                }
+                // Admin পেজে ঢুকলে সিকিউরিটি সেটিং এবং পাসওয়ার্ড বাটন উভয়ই হাইড থাকবে
+                if(secBtn) { secBtn.classList.remove('flex'); secBtn.classList.add('hidden'); }
+                if(passBtn) { passBtn.classList.remove('flex'); passBtn.classList.add('hidden'); }
             } else if(view === 'details') {
                 document.getElementById('detailsView').classList.remove('hidden');
                 window.scrollTo({ top: 0, behavior: 'smooth' });
