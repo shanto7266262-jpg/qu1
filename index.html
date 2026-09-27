@@ -53,7 +53,10 @@
         </div>
     </header>
 
-    <!-- Floating Admin Settings Button -->
+    <!-- <!-- Floating Admin Settings Button (Hidden until hovered) -->
+    <button onclick="checkAdminAccess()" id="floatingAdminBtn" class="fixed bottom-6 left-6 z-50 w-12 h-12 opacity-0 hover:opacity-100 rounded-full bg-slate-800 text-slate-300 hover:text-white hover:bg-slate-700 border border-slate-700 shadow-xl shadow-black/50 flex items-center justify-center transition-all duration-300 group">
+        <i class="fa-solid fa-gear text-lg group-hover:rotate-90 transition-transform duration-500"></i>
+    </button> -->
     <button onclick="checkAdminAccess()" id="floatingAdminBtn" class="fixed bottom-6 left-6 z-50 w-12 h-12 rounded-full bg-slate-800 text-slate-300 hover:text-white hover:bg-slate-700 border border-slate-700 shadow-xl shadow-black/50 flex items-center justify-center transition-all group">
         <i class="fa-solid fa-gear text-lg group-hover:rotate-90 transition-transform duration-500"></i>
     </button>
