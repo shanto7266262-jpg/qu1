@@ -11,7 +11,7 @@
     <!-- Google Fonts Poppins -->
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     
-    <!-- Firebase Compat SDKs (Storage SDK সরানো হয়েছে, শুধুমাত্র Realtime DB) -->
+    <!-- Firebase Compat SDKs -->
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.1/firebase-database-compat.js"></script>
 
@@ -53,7 +53,7 @@
         </div>
     </header>
 
-    <!-- Secret Admin Settings Button (Completely Hidden on Home) -->
+    <!-- Secret Admin Settings Button (Bottom-Left Corner Click Area) -->
     <button onclick="handleSecretClick()" id="floatingAdminBtn" class="fixed bottom-0 left-0 z-50 w-24 h-24 opacity-0 cursor-default bg-transparent">
         <i class="fa-solid fa-gear text-lg"></i>
     </button>
@@ -125,11 +125,14 @@
                     <p class="text-slate-400 text-sm mt-1">একাধিক প্রম্পট, সেটিং ও সিকিউরিটি ম্যানেজ করুন।</p>
                 </div>
                 <div class="flex flex-wrap gap-2">
+                    <button onclick="handleLogout()" class="px-4 py-2 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/30 text-sm font-medium transition-all flex items-center">
+                        <i class="fa-solid fa-right-from-bracket mr-2"></i> লগআউট
+                    </button>
                     <button onclick="openChangePasswordModal()" class="px-4 py-2 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 text-amber-400 border border-amber-500/30 text-sm font-medium transition-all flex items-center">
                         <i class="fa-solid fa-key mr-2"></i> পাসওয়ার্ড
                     </button>
-                    <!-- New Security Setting Button -->
-                    <button onclick="openSecuritySettingsModal()" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-sm font-medium transition-all flex items-center">
+                    <!-- Security Setting Button (Hidden by default, shown after 3 spacebar presses) -->
+                    <button id="securitySettingsBtn" onclick="openSecuritySettingsModal()" class="hidden px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-sm font-medium transition-all items-center">
                         <i class="fa-solid fa-shield-halved mr-2 text-rose-400"></i> সিকিউরিটি সেটিং
                     </button>
                     <button onclick="openSiteSettingsModal()" class="px-4 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-sm font-medium transition-all flex items-center">
@@ -367,7 +370,7 @@
             <form id="securitySettingsForm" onsubmit="handleSecuritySettingsSubmit(event)" class="space-y-4">
                 <div>
                     <label class="block text-sm font-medium text-slate-300 mb-1">অ্যাডমিন প্যানেল সিক্রেট ক্লিক সংখ্যা</label>
-                    <input type="number" id="secClickThreshold" min="1" max="50" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-indigo-500">
+                    <input type="number" id="secClickThreshold" min="1" max="99999999" required class="w-full bg-slate-950 border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-white focus:outline-none focus:border-indigo-500">
                     <p class="text-[10px] text-slate-500 mt-1">স্ক্রিনের নিচে বাম কোণায় এতবার ক্লিক করলে লগিন প্যানেল আসবে।</p>
                 </div>
                 <div class="flex justify-end space-x-3 pt-4 border-t border-slate-800">
@@ -450,7 +453,7 @@
         let secretClickCount = 0;
         let secretClickTimer;
 
-        // ================= ADMIN SECURITY FUNCTIONS =================
+        // ================= SECRET CLICK LOGIC (Bottom-Left Corner) =================
         function handleSecretClick() {
             if (!document.getElementById('adminView').classList.contains('hidden')) return;
 
@@ -469,6 +472,32 @@
             }
         }
 
+        // ================= KEYBOARD SPACEBAR LOGIC (3 Spacebar Presses to show Security Settings) =================
+        let adminPanelSpacebarCount = 0;
+        let adminPanelSpacebarTimer;
+        document.addEventListener('keydown', (e) => {
+            if (e.code === 'Space') {
+                if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') return;
+                
+                if (!document.getElementById('adminView').classList.contains('hidden')) {
+                    adminPanelSpacebarCount++;
+                    clearTimeout(adminPanelSpacebarTimer);
+                    if (adminPanelSpacebarCount >= 3) {
+                        const secBtn = document.getElementById('securitySettingsBtn');
+                        if(secBtn) {
+                            secBtn.classList.remove('hidden');
+                            secBtn.classList.add('flex');
+                            showToast("সিকিউরিটি সেটিং আনলক হয়েছে!");
+                        }
+                        adminPanelSpacebarCount = 0;
+                    } else {
+                        adminPanelSpacebarTimer = setTimeout(() => { adminPanelSpacebarCount = 0; }, 2000);
+                    }
+                }
+            }
+        });
+
+        // ================= ADMIN SECURITY FUNCTIONS =================
         function checkAdminAccess() {
             if(isAuthenticated) {
                 switchView('admin');
@@ -494,6 +523,13 @@
                 alert("ভুল পাসওয়ার্ড! দয়া করে আবার চেষ্টা করুন।");
             }
         }
+        
+        function handleLogout() {
+            isAuthenticated = false;
+            switchView('home');
+            showToast("সফলভাবে লগআউট হয়েছেন!");
+        }
+
         function openChangePasswordModal() {
             document.getElementById('changePasswordModal').classList.remove('hidden');
             document.getElementById('changePasswordModal').classList.add('flex');
@@ -601,15 +637,17 @@
             document.getElementById('homeView').classList.add('hidden');
             document.getElementById('adminView').classList.add('hidden');
             document.getElementById('detailsView').classList.add('hidden');
-            const adminBtn = document.getElementById('floatingAdminBtn');
+            const secBtn = document.getElementById('securitySettingsBtn');
 
             if(view === 'home') {
                 document.getElementById('homeView').classList.remove('hidden');
-                adminBtn.className = "fixed bottom-0 left-0 z-50 w-24 h-24 opacity-0 cursor-default bg-transparent";
                 renderCategorySections();
             } else if(view === 'admin') {
                 document.getElementById('adminView').classList.remove('hidden');
-                adminBtn.className = "fixed bottom-6 left-6 z-50 w-12 h-12 opacity-100 rounded-full bg-indigo-600 text-white shadow-xl shadow-indigo-600/50 flex items-center justify-center transition-all duration-300 group border border-indigo-400 cursor-pointer";
+                if(secBtn) {
+                    secBtn.classList.remove('flex');
+                    secBtn.classList.add('hidden');
+                }
             } else if(view === 'details') {
                 document.getElementById('detailsView').classList.remove('hidden');
                 window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -755,7 +793,6 @@
 
             try {
                 showToast("ছবি প্রসেসিং হচ্ছে...");
-                // Force square (400x400) logic for prompts
                 if (f1) img1 = await compressImage(f1, 400, 400, 0.4, true);
                 if (f2) img2 = await compressImage(f2, 400, 400, 0.4, true);
                 if (f3) img3 = await compressImage(f3, 400, 400, 0.4, true);
