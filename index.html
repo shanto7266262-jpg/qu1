@@ -111,9 +111,9 @@
 
             <div class="space-y-4">
                 <h3 class="text-lg font-bold text-white flex items-center">
-                    <i class="fa-solid fa-images mr-2 text-violet-400"></i> থাম্বনেইল ইমেজসমূহ (1:1 Ratio)
+                    <i class="fa-solid fa-images mr-2 text-violet-400"></i> থাম্বনেইল ইমেজ (1:1 Ratio)
                 </h3>
-                <div id="detailImagesList" class="grid grid-cols-1 sm:grid-cols-3 gap-4"></div>
+                <div id="detailImagesList" class="grid grid-cols-1 sm:grid-cols-2 gap-4"></div>
             </div>
         </div>
 
@@ -216,7 +216,7 @@
         </div>
     </div>
     
-    <!-- ADD/EDIT PROMPT MODAL -->
+    <!-- ADD/EDIT PROMPT MODAL (With Fixed Scale & Drag Preview) -->
     <div id="promptModal" class="fixed inset-0 z-[60] bg-black/80 backdrop-blur-md hidden items-center justify-center p-4 transition-all">
         <div class="bg-slate-900 border border-slate-800 rounded-3xl w-full max-w-2xl max-h-[90vh] overflow-y-auto p-6 sm:p-8 space-y-6 shadow-2xl">
             <div class="flex items-center justify-between border-b border-slate-800 pb-4">
@@ -245,40 +245,42 @@
                         </select>
                     </div>
                 </div>
-                <!-- 1:1 Image Uploads -->
+
+                <!-- Single Image Upload with Zoom & Drag Reposition Preview -->
                 <div class="space-y-3 bg-slate-950 p-4 rounded-2xl border border-slate-800/80">
-                    <label class="block text-sm font-medium text-indigo-400"><i class="fa-solid fa-images mr-1"></i> ৩টি ইমেজ (1:1 Ratio) ও ভিউ কাউন্ট</label>
+                    <label class="block text-sm font-medium text-indigo-400"><i class="fa-solid fa-image mr-1"></i> থাম্বনেইল ইমেজ ও অপশনাল ভিউ কাউন্ট</label>
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 items-center bg-slate-900 p-3 rounded-xl border border-slate-800">
                         <div class="sm:col-span-2">
-                            <label class="text-xs text-slate-400 block mb-1">ছবি ১</label>
-                            <input type="file" id="imgFile1" accept="image/*" class="w-full text-xs text-slate-400 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-indigo-600 file:text-white hover:file:bg-indigo-500 cursor-pointer">
+                            <label class="text-xs text-slate-400 block mb-1">ছবি সিলেক্ট করুন</label>
+                            <input type="file" id="imgFile1" accept="image/*" onchange="handleImagePreview(event)" class="w-full text-xs text-slate-400 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-indigo-600 file:text-white hover:file:bg-indigo-500 cursor-pointer">
                         </div>
                         <div>
-                            <label class="text-xs text-slate-400 block mb-1">ভিউ কাউন্ট ১</label>
-                            <input type="text" id="viewCount1" placeholder="10M" value="10M" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-xs text-white">
+                            <label class="text-xs text-slate-400 block mb-1">ভিউ কাউন্ট (অপশনাল)</label>
+                            <input type="text" id="viewCount1" placeholder="যেমন: 5M" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-xs text-white">
                         </div>
                     </div>
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 items-center bg-slate-900 p-3 rounded-xl border border-slate-800">
-                        <div class="sm:col-span-2">
-                            <label class="text-xs text-slate-400 block mb-1">ছবি ২</label>
-                            <input type="file" id="imgFile2" accept="image/*" class="w-full text-xs text-slate-400 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-indigo-600 file:text-white hover:file:bg-indigo-500 cursor-pointer">
+
+                    <!-- Interactive Image Adjuster Box -->
+                    <div class="space-y-2 mt-3 pt-3 border-t border-slate-800">
+                        <div class="flex justify-between items-center text-xs text-slate-400">
+                            <span><i class="fa-solid fa-arrows-up-down-left-right mr-1"></i> মাউস দিয়ে টেনে পজিশন ঠিক করুন এবং জুম করুন:</span>
+                            <span id="zoomVal" class="text-indigo-400 font-semibold">100%</span>
                         </div>
-                        <div>
-                            <label class="text-xs text-slate-400 block mb-1">ভিউ কাউন্ট ২</label>
-                            <input type="text" id="viewCount2" placeholder="20M" value="20M" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-xs text-white">
+                        <!-- Preview Frame -->
+                        <div id="imagePreviewFrame" class="relative w-full aspect-[4/3] bg-slate-950 rounded-xl overflow-hidden border border-slate-700 cursor-grab active:cursor-grabbing select-none flex items-center justify-center">
+                            <p id="previewPlaceholder" class="text-xs text-slate-500">ছবি সিলেক্ট করলে প্রিভিউ দেখা যাবে</p>
+                            <img id="draggableImage" src="" class="absolute max-none hidden pointer-events-none" alt="Preview">
                         </div>
-                    </div>
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 items-center bg-slate-900 p-3 rounded-xl border border-slate-800">
-                        <div class="sm:col-span-2">
-                            <label class="text-xs text-slate-400 block mb-1">ছবি ৩</label>
-                            <input type="file" id="imgFile3" accept="image/*" class="w-full text-xs text-slate-400 file:mr-3 file:py-1.5 file:px-3 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-indigo-600 file:text-white hover:file:bg-indigo-500 cursor-pointer">
-                        </div>
-                        <div>
-                            <label class="text-xs text-slate-400 block mb-1">ভিউ কাউন্ট ৩</label>
-                            <input type="text" id="viewCount3" placeholder="30M" value="30M" class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3 py-1.5 text-xs text-white">
+                        <!-- Zoom Slider -->
+                        <div class="flex items-center space-x-3 pt-1">
+                            <span class="text-[10px] text-slate-500">ছোট</span>
+                            <input type="range" id="zoomSlider" min="50" max="300" value="100" oninput="updateImageTransform()" class="w-full accent-indigo-600 cursor-pointer">
+                            <span class="text-[10px] text-slate-500">বড়</span>
+                            <button type="button" onclick="resetImageTransform()" class="px-2 py-1 bg-slate-800 hover:bg-slate-700 text-[10px] text-slate-300 rounded">রিসেট</button>
                         </div>
                     </div>
                 </div>
+
                 <div class="space-y-4 bg-slate-950 p-4 rounded-2xl border border-slate-800/80">
                     <div class="flex items-center justify-between">
                         <label class="block text-sm font-medium text-indigo-400"><i class="fa-solid fa-terminal mr-1"></i> একাধিক প্রম্পট</label>
@@ -387,7 +389,7 @@
 
     <!-- JavaScript Logic -->
     <script>
-        // ================= FIREBASE CONFIGURATION (Realtime Database Only) =================
+        // ================= FIREBASE CONFIGURATION =================
         const firebaseConfig = {
             apiKey: "AIzaSyCxtcrrxI1m-g3LIm5-JW76WdyBIOa1G_g",
             authDomain: "pp11-bdd35.firebaseapp.com",
@@ -400,7 +402,7 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.database();
 
-        // 1:1 Aspect Ratio Demo Generator
+        // Demo Data Generator with Single Image
         const demoImages = [
             "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe",
             "https://images.unsplash.com/photo-1550745165-9bc0b252726f",
@@ -415,17 +417,13 @@
         
         initialCategories.filter(c => c !== "ALL").forEach((cat, index) => {
             for(let i=1; i<=5; i++) {
-                let imgBase1 = demoImages[(index + i) % demoImages.length];
-                let imgBase2 = demoImages[(index + i + 1) % demoImages.length];
-                let imgBase3 = demoImages[(index + i + 2) % demoImages.length];
+                let imgBase = demoImages[(index + i) % demoImages.length];
                 
                 generatedPrompts.push({
                     title: `Epic ${cat} Content Idea #${i}`,
                     category: cat,
                     badge: i % 2 === 0 ? "Premium" : (i === 3 ? "Free" : "Trending"),
-                    img1: `${imgBase1}?w=400&h=400&fit=crop`, view1: (10 + i) + "M",
-                    img2: `${imgBase2}?w=400&h=400&fit=crop`, view2: (15 + i) + "M",
-                    img3: `${imgBase3}?w=400&h=400&fit=crop`, view3: (20 + i) + "M",
+                    img1: `${imgBase}?w=500&h=500&fit=crop`, view1: (10 + i) + "M",
                     promptsList: [{ name: "Main Prompt", text: `High quality hyper-realistic 8k cinematic shot for ${cat} concept ${i}. Make it extremely detailed and aesthetic.` }],
                     content: `High quality hyper-realistic 8k cinematic shot for ${cat} concept ${i}.`,
                     timestamp: Date.now() - (i * 1000)
@@ -435,7 +433,7 @@
 
         const initialHeroSettings = {
             mainTitle: "Viral Prompts Tap, Copy, Create",
-            marqueeText: '<i class="fa-solid fa-bolt text-amber-400 mx-2"></i> Trending Now: Cyberpunk Metaverse Avatars <i class="fa-solid fa-bolt text-amber-400 mx-2"></i> Hot Upload: Cinematic Drone Shots <i class="fa-solid fa-bolt text-amber-400 mx-2"></i> New: ASMR Kinetic Sand',
+            marqueeText: '<i class="fa-solid fa-bolt text-amber-400 mx-2"></i> Trending Now: Cyberpunk Metaverse Avatars <i class="fa-solid fa-bolt text-amber-400 mx-2"></i> Hot Upload: Cinematic Drone Shots',
             img1: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?w=1200&h=400&fit=crop",
             img2: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=1200&h=400&fit=crop",
             img3: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?w=1200&h=400&fit=crop"
@@ -448,13 +446,143 @@
         let heroSettings = {};
         let activeCategory = "ALL";
         
-        // Admin Security States
         let currentAdminPassword = "admin";
         let isAuthenticated = false;
         let secretClickCount = 0;
         let secretClickTimer;
 
-        // ================= SECRET CLICK LOGIC (Bottom-Left Corner) =================
+        // ================= IMAGE PREVIEW & DRAG/ZOOM LOGIC (Fixed Scale) =================
+        let loadedImgObj = null;
+        let imgScale = 1;
+        let imgPosX = 0;
+        let imgPosY = 0;
+        let isDragging = false;
+        let startX = 0, startY = 0;
+
+        function handleImagePreview(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = function(event) {
+                const img = new Image();
+                img.onload = function() {
+                    loadedImgObj = img;
+                    const previewImg = document.getElementById('draggableImage');
+                    previewImg.src = event.target.result;
+                    previewImg.classList.remove('hidden');
+                    document.getElementById('previewPlaceholder').classList.add('hidden');
+                    
+                    // Fit image nicely into preview frame initially
+                    const frame = document.getElementById('imagePreviewFrame');
+                    const fW = frame.clientWidth || 400;
+                    const fH = frame.clientHeight || 300;
+                    
+                    let baseScale = Math.min(fW / img.width, fH / img.height);
+                    imgScale = baseScale;
+                    imgPosX = 0;
+                    imgPosY = 0;
+
+                    const slider = document.getElementById('zoomSlider');
+                    slider.value = 100;
+                    document.getElementById('zoomVal').innerText = "100%";
+                    updateImageTransform();
+                };
+                img.src = event.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function resetImageTransform() {
+            if (!loadedImgObj) return;
+            const frame = document.getElementById('imagePreviewFrame');
+            const fW = frame.clientWidth || 400;
+            const fH = frame.clientHeight || 300;
+            imgScale = Math.min(fW / loadedImgObj.width, fH / loadedImgObj.height);
+            imgPosX = 0;
+            imgPosY = 0;
+            document.getElementById('zoomSlider').value = 100;
+            document.getElementById('zoomVal').innerText = "100%";
+            updateImageTransform();
+        }
+
+        function updateImageTransform() {
+            if (!loadedImgObj) return;
+            const slider = document.getElementById('zoomSlider');
+            const sliderVal = slider.value / 100; // 0.5 to 3.0
+            
+            const frame = document.getElementById('imagePreviewFrame');
+            const fW = frame.clientWidth || 400;
+            const fH = frame.clientHeight || 300;
+            const baseScale = Math.min(fW / loadedImgObj.width, fH / loadedImgObj.height);
+            
+            let currentActiveScale = baseScale * sliderVal;
+            document.getElementById('zoomVal').innerText = slider.value + "%";
+
+            const previewImg = document.getElementById('draggableImage');
+            previewImg.style.width = (loadedImgObj.width * currentActiveScale) + 'px';
+            previewImg.style.height = (loadedImgObj.height * currentActiveScale) + 'px';
+            previewImg.style.left = ((fW - (loadedImgObj.width * currentActiveScale)) / 2 + imgPosX) + 'px';
+            previewImg.style.top = ((fH - (loadedImgObj.height * currentActiveScale)) / 2 + imgPosY) + 'px';
+        }
+
+        // Dragging Event Listeners for Preview Frame
+        const previewFrame = document.getElementById('imagePreviewFrame');
+        if (previewFrame) {
+            previewFrame.addEventListener('mousedown', (e) => {
+                isDragging = true;
+                startX = e.clientX - imgPosX;
+                startY = e.clientY - imgPosY;
+            });
+            window.addEventListener('mousemove', (e) => {
+                if (!isDragging) return;
+                imgPosX = e.clientX - startX;
+                imgPosY = e.clientY - startY;
+                updateImageTransform();
+            });
+            window.addEventListener('mouseup', () => { isDragging = false; });
+        }
+
+        // Generate Properly Scaled Final Image from Preview
+        function getProcessedImageBase64() {
+            return new Promise((resolve) => {
+                const previewImg = document.getElementById('draggableImage');
+                if (!loadedImgObj || previewImg.classList.contains('hidden')) {
+                    resolve(previewImg.src || "");
+                    return;
+                }
+
+                const canvas = document.createElement('canvas');
+                const targetW = 600;
+                const targetH = 450;
+                canvas.width = targetW;
+                canvas.height = targetH;
+                const ctx = canvas.getContext('2d');
+                ctx.fillStyle = "#0f172a";
+                ctx.fillRect(0, 0, targetW, targetH);
+
+                const frame = document.getElementById('imagePreviewFrame');
+                const frameW = frame.clientWidth || 400;
+                const frameH = frame.clientHeight || 300;
+
+                const slider = document.getElementById('zoomSlider');
+                const sliderVal = slider.value / 100;
+                const baseScale = Math.min(frameW / loadedImgObj.width, frameH / loadedImgObj.height);
+                const currentActiveScale = baseScale * sliderVal;
+
+                const scaleX = targetW / frameW;
+                const scaleY = targetH / frameH;
+
+                ctx.save();
+                ctx.translate((targetW / 2) + (imgPosX * scaleX), (targetH / 2) + (imgPosY * scaleY));
+                ctx.scale(currentActiveScale * scaleX, currentActiveScale * scaleY);
+                ctx.drawImage(loadedImgObj, -loadedImgObj.width / 2, -loadedImgObj.height / 2);
+                ctx.restore();
+
+                resolve(canvas.toDataURL('image/jpeg', 0.7));
+            });
+        }
+
+        // ================= SECRET CLICK LOGIC =================
         function handleSecretClick() {
             if (!document.getElementById('adminView').classList.contains('hidden')) return;
 
@@ -473,7 +601,7 @@
             }
         }
 
-        // ================= KEYBOARD LOGIC (3 Spacebars for Security Settings, 5 Zeros for Password Button) =================
+        // ================= KEYBOARD LOGIC =================
         let adminPanelSpacebarCount = 0;
         let adminPanelSpacebarTimer;
         
@@ -484,7 +612,6 @@
             if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') return;
             
             if (!document.getElementById('adminView').classList.contains('hidden')) {
-                // ৩ বার স্পেস চাপলে সিকিউরিটি সেটিং শো করবে
                 if (e.code === 'Space') {
                     adminPanelSpacebarCount++;
                     clearTimeout(adminPanelSpacebarTimer);
@@ -501,7 +628,6 @@
                     }
                 }
 
-                // ৫ বার জিরো ('0' বা Digit0) চাপলে পাসওয়ার্ড বাটন শো করবে
                 if (e.code === 'Digit0' || e.key === '0') {
                     zeroKeyCount++;
                     clearTimeout(zeroKeyTimer);
@@ -575,7 +701,7 @@
             showToast("পাসওয়ার্ড সফলভাবে পরিবর্তন করা হয়েছে!");
         }
 
-        // ================= IMAGE COMPRESSION LOGIC (1:1 Ratio for Prompts) =================
+        // ================= IMAGE COMPRESSION LOGIC =================
         const compressImage = (file, maxWidth, maxHeight, quality, forceSquare = false) => {
             return new Promise((resolve, reject) => {
                 const reader = new FileReader();
@@ -668,7 +794,6 @@
                 renderCategorySections();
             } else if(view === 'admin') {
                 document.getElementById('adminView').classList.remove('hidden');
-                // Admin পেজে ঢুকলে সিকিউরিটি সেটিং এবং পাসওয়ার্ড বাটন উভয়ই হাইড থাকবে
                 if(secBtn) { secBtn.classList.remove('flex'); secBtn.classList.add('hidden'); }
                 if(passBtn) { passBtn.classList.remove('flex'); passBtn.classList.add('hidden'); }
             } else if(view === 'details') {
@@ -704,6 +829,7 @@
 
         function filterCategory(cat) { activeCategory = cat; renderCategories(); renderCategorySections(); }
 
+        // Render Category Sections with Optional View Count Badge
         function renderCategorySections() {
             const container = document.getElementById('categorySectionsContainer');
             let targetCategories = activeCategory === "ALL" ? categories.filter(c => c !== "ALL") : [activeCategory];
@@ -723,32 +849,32 @@
                     htmlContent += `<div class="text-sm text-slate-500 py-4">এই ক্যাটাগরিতে কোনো প্রম্পট নেই।</div>`;
                 } else {
                     htmlContent += `<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">`;
-                    htmlContent += catPrompts.map((p) => `
-                        <div class="viral-card bg-slate-900 border border-slate-800 rounded-3xl p-4 flex flex-col justify-between space-y-4 shadow-xl">
-                            <div class="grid grid-cols-3 gap-2">
-                                <div class="relative group overflow-hidden rounded-2xl bg-slate-950 aspect-square">
-                                    <img src="${p.img1}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" alt="img1">
-                                    <div class="absolute bottom-1 left-1 bg-black/75 px-1.5 py-0.5 rounded-md text-[9px] font-semibold text-white flex items-center space-x-1"><i class="fa-solid fa-bolt text-[7px] text-amber-400"></i><span>${p.view1}</span></div>
-                                </div>
-                                <div class="relative group overflow-hidden rounded-2xl bg-slate-950 aspect-square">
-                                    <img src="${p.img2}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" alt="img2">
-                                    <div class="absolute bottom-1 left-1 bg-black/75 px-1.5 py-0.5 rounded-md text-[9px] font-semibold text-white flex items-center space-x-1"><i class="fa-solid fa-play text-[7px] text-indigo-400"></i><span>${p.view2}</span></div>
-                                </div>
-                                <div class="relative group overflow-hidden rounded-2xl bg-slate-950 aspect-square">
-                                    <img src="${p.img3}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" alt="img3">
-                                    <div class="absolute bottom-1 left-1 bg-black/75 px-1.5 py-0.5 rounded-md text-[9px] font-semibold text-white flex items-center space-x-1"><i class="fa-solid fa-chart-simple text-[7px] text-emerald-400"></i><span>${p.view3}</span></div>
-                                </div>
+                    htmlContent += catPrompts.map((p) => {
+                        let viewBadgeHTML = (p.view1 && p.view1.trim() !== "") ? `
+                            <div class="absolute bottom-2 left-2 bg-black/75 backdrop-blur-md px-2 py-1 rounded-lg text-[10px] font-semibold text-white flex items-center space-x-1">
+                                <i class="fa-solid fa-bolt text-[8px] text-amber-400"></i><span>${p.view1}</span>
+                            </div>
+                        ` : '';
+
+                        return `
+                        <div class="viral-card bg-slate-900 border border-slate-800 rounded-3xl p-5 flex flex-col justify-between space-y-5 shadow-xl">
+                            <div class="relative group overflow-hidden rounded-2xl bg-slate-950 aspect-[4/3] w-full">
+                                <img src="${p.img1}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" alt="img">
+                                ${viewBadgeHTML}
                             </div>
                             <div class="space-y-2">
                                 <div class="flex items-center justify-between">
                                     <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold bg-indigo-500/20 text-indigo-400 border border-indigo-500/30 uppercase tracking-wider">${p.category}</span>
-                                    <span class="text-xs text-slate-500 font-medium">${p.badge}</span>
+                                    <span class="text-xs text-slate-400 font-medium">${p.badge}</span>
                                 </div>
-                                <h3 class="font-bold text-sm text-white line-clamp-2 tracking-tight">${p.title}</h3>
+                                <h3 class="font-bold text-base text-white line-clamp-2 tracking-tight">${p.title}</h3>
                             </div>
-                            <button onclick='openDetailsPage(${JSON.stringify(p).replace(/'/g, "&#39;")})' class="w-full py-2.5 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-semibold shadow-lg shadow-indigo-600/30 transition-all">Open prompt</button>
+                            <button onclick='openDetailsPage(${JSON.stringify(p).replace(/'/g, "&#39;")})' class="w-full py-3 rounded-2xl bg-indigo-600 hover:bg-indigo-500 text-white text-sm font-semibold shadow-lg shadow-indigo-600/30 transition-all flex items-center justify-center space-x-2">
+                                <span>Open prompt</span>
+                            </button>
                         </div>
-                    `).join('');
+                    `;
+                    }).join('');
                     htmlContent += `</div>`;
                 }
                 htmlContent += `</div>`;
@@ -793,6 +919,7 @@
 
         async function deletePrompt(promptId) { if(confirm("ডিলিট করতে চান?")) await db.ref('prompts/' + promptId).remove(); }
 
+        // Prompt Form Submit with Properly Scaled Canvas Image
         async function handlePromptSubmit(e) {
             e.preventDefault();
             const editIndex = parseInt(document.getElementById('editIndex').value);
@@ -800,9 +927,7 @@
             const title = document.getElementById('promptTitle').value;
             const category = document.getElementById('promptCategory').value;
             const badge = document.getElementById('promptBadge').value;
-            const view1 = document.getElementById('viewCount1').value || "10M";
-            const view2 = document.getElementById('viewCount2').value || "20M";
-            const view3 = document.getElementById('viewCount3').value || "30M";
+            const view1 = document.getElementById('viewCount1').value.trim();
 
             let promptsList = [];
             const names = document.querySelectorAll('.prompt-name-input');
@@ -811,16 +936,12 @@
             
             if(promptsList.length === 0) { alert("প্রম্পট যোগ করুন!"); saveBtn.disabled = false; saveBtn.innerText = "সংরক্ষণ করুন"; return; }
 
-            const f1 = document.getElementById('imgFile1').files[0]; const f2 = document.getElementById('imgFile2').files[0]; const f3 = document.getElementById('imgFile3').files[0];
-            let img1 = editIndex !== -1 ? prompts[editIndex].img1 : ""; let img2 = editIndex !== -1 ? prompts[editIndex].img2 : ""; let img3 = editIndex !== -1 ? prompts[editIndex].img3 : "";
-
             try {
                 showToast("ছবি প্রসেসিং হচ্ছে...");
-                if (f1) img1 = await compressImage(f1, 400, 400, 0.4, true);
-                if (f2) img2 = await compressImage(f2, 400, 400, 0.4, true);
-                if (f3) img3 = await compressImage(f3, 400, 400, 0.4, true);
+                let img1 = await getProcessedImageBase64();
+                if (!img1 && editIndex !== -1) img1 = prompts[editIndex].img1;
 
-                const promptObj = { title, category, badge, img1, view1, img2, view2, img3, view3, promptsList, content: promptsList[0].text, timestamp: Date.now() };
+                const promptObj = { title, category, badge, img1, view1, promptsList, content: promptsList[0].text, timestamp: Date.now() };
                 if(editIndex === -1) await db.ref('prompts').push(promptObj);
                 else await db.ref('prompts/' + prompts[editIndex].id).set(promptObj);
                 
@@ -872,9 +993,50 @@
         }
 
         // Modal Toggles...
-        function openPromptModal() { document.getElementById('modalTitle').innerText = "নতুন প্রম্পট"; document.getElementById('editIndex').value = "-1"; document.getElementById('promptForm').reset(); document.getElementById('promptsFieldsContainer').innerHTML = ""; addPromptField("Main Prompt", ""); document.getElementById('promptModal').classList.replace('hidden','flex'); }
+        function openPromptModal() { 
+            document.getElementById('modalTitle').innerText = "নতুন প্রম্পট"; 
+            document.getElementById('editIndex').value = "-1"; 
+            document.getElementById('promptForm').reset(); 
+            document.getElementById('promptsFieldsContainer').innerHTML = ""; 
+            addPromptField("Main Prompt", ""); 
+            
+            loadedImgObj = null;
+            const previewImg = document.getElementById('draggableImage');
+            previewImg.src = "";
+            previewImg.classList.add('hidden');
+            document.getElementById('previewPlaceholder').classList.remove('hidden');
+
+            document.getElementById('promptModal').classList.replace('hidden','flex'); 
+        }
         function closePromptModal() { document.getElementById('promptModal').classList.replace('flex','hidden'); }
-        function editPrompt(idx) { const p = prompts[idx]; document.getElementById('modalTitle').innerText = "প্রম্পট এডিট"; document.getElementById('editIndex').value = idx; document.getElementById('promptTitle').value = p.title; document.getElementById('promptCategory').value = p.category; document.getElementById('promptBadge').value = p.badge; document.getElementById('viewCount1').value = p.view1; document.getElementById('viewCount2').value = p.view2; document.getElementById('viewCount3').value = p.view3; document.getElementById('promptsFieldsContainer').innerHTML = ""; let list = p.promptsList || [{ name: "Main Prompt", text: p.content || "" }]; list.forEach(item => addPromptField(item.name, item.text)); document.getElementById('promptModal').classList.replace('hidden','flex'); }
+        
+        function editPrompt(idx) { 
+            const p = prompts[idx]; 
+            document.getElementById('modalTitle').innerText = "প্রম্পট এডিট"; 
+            document.getElementById('editIndex').value = idx; 
+            document.getElementById('promptTitle').value = p.title; 
+            document.getElementById('promptCategory').value = p.category; 
+            document.getElementById('promptBadge').value = p.badge; 
+            document.getElementById('viewCount1').value = p.view1 || ""; 
+            
+            document.getElementById('promptsFieldsContainer').innerHTML = ""; 
+            let list = p.promptsList || [{ name: "Main Prompt", text: p.content || "" }]; 
+            list.forEach(item => addPromptField(item.name, item.text)); 
+            
+            const img = new Image();
+            img.onload = function() {
+                loadedImgObj = img;
+                const previewImg = document.getElementById('draggableImage');
+                previewImg.src = p.img1;
+                previewImg.classList.remove('hidden');
+                document.getElementById('previewPlaceholder').classList.add('hidden');
+                resetImageTransform();
+            };
+            img.src = p.img1;
+
+            document.getElementById('promptModal').classList.replace('hidden','flex'); 
+        }
+
         function openHeroSettingsModal() { document.getElementById('hsMainTitle').value = heroSettings.mainTitle; document.getElementById('hsMarqueeText').value = heroSettings.marqueeText; document.getElementById('heroSettingsForm').reset(); document.getElementById('heroSettingsModal').classList.replace('hidden','flex'); }
         function closeHeroSettingsModal() { document.getElementById('heroSettingsModal').classList.replace('flex','hidden'); }
         
@@ -899,7 +1061,19 @@
             document.getElementById('detailCategoryBadge').innerText = p.category; document.getElementById('detailBadge').innerText = p.badge; document.getElementById('detailTitle').innerText = p.title;
             let items = p.promptsList || [{ name: "Main Prompt", text: p.content || "" }];
             document.getElementById('detailPromptsList').innerHTML = items.map((item, index) => `<div class="bg-slate-900 border border-slate-800 p-6 rounded-2xl space-y-3 shadow-lg"><span class="text-xs font-bold text-indigo-400"><i class="fa-solid fa-code mr-1"></i> ${item.name || 'Prompt '+(index+1)}</span><p class="text-sm text-slate-300 whitespace-pre-wrap select-all bg-slate-950 p-4 rounded-xl border border-slate-800">${item.text}</p><button onclick='copySinglePrompt(${JSON.stringify(item.text).replace(/'/g, "&#39;")})' class="w-full py-2.5 bg-indigo-600 hover:bg-indigo-500 text-white text-xs font-medium rounded-xl transition-all"><i class="fa-regular fa-copy mr-1.5"></i> কপি করুন</button></div>`).join('');
-            document.getElementById('detailImagesList').innerHTML = [{ url: p.img1, view: p.view1 }, { url: p.img2, view: p.view2 }, { url: p.img3, view: p.view3 }].map(img => `<div class="relative rounded-2xl bg-slate-900 border border-slate-800 aspect-square shadow-lg overflow-hidden group"><img src="${img.url}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" alt="Thumb"><div class="absolute bottom-3 left-3 bg-black/80 px-2.5 py-1 rounded-lg text-xs font-semibold text-white border border-slate-700 flex items-center"><i class="fa-solid fa-bolt text-amber-400 mr-1.5"></i>Views: ${img.view}</div></div>`).join('');
+            
+            let detailViewBadge = (p.view1 && p.view1.trim() !== "") ? `
+                <div class="absolute bottom-3 left-3 bg-black/80 px-3 py-1.5 rounded-lg text-xs font-semibold text-white border border-slate-700 flex items-center">
+                    <i class="fa-solid fa-bolt text-amber-400 mr-1.5"></i>Views: ${p.view1}
+                </div>
+            ` : '';
+
+            document.getElementById('detailImagesList').innerHTML = `
+                <div class="relative rounded-2xl bg-slate-900 border border-slate-800 aspect-[4/3] shadow-lg overflow-hidden group sm:col-span-2">
+                    <img src="${p.img1}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300" alt="Thumb">
+                    ${detailViewBadge}
+                </div>
+            `;
             switchView('details');
         }
 
